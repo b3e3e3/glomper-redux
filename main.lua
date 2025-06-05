@@ -36,7 +36,7 @@ local playerEntity =
     Concord.entity(ECS.world)
     :assemble(ECS.a.player)
 
-Concord.entity(ECS.world)
+local testObject = Concord.entity(ECS.world)
 :assemble(ECS.a.glompable, love.graphics.getWidth() / 4)
 :give("testdraw")
 

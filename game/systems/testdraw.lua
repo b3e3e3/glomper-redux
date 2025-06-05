@@ -3,6 +3,7 @@ local TestDrawSystem = Concord.system({
 })
 
 function TestDrawSystem:draw()
+
     for _, e in ipairs(self.pool) do
         love.graphics.push()
         love.graphics.setColor(1,1,1)
