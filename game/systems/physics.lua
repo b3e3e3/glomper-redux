@@ -4,11 +4,6 @@ local PhysicsSystem = Concord.system({
 })
 
 function PhysicsSystem:onEntityAdded(e)
-    -- print("Adding entity with:")
-    -- for _,v in pairs(e:getComponents()) do
-    --     print('- ' .. v:getName())
-    -- end
-    -- print("Adding entity")
     if not self.pool:has(e) then return end
     if Game.bumpWorld:hasItem(e) then return end
     Game.bumpWorld:add(e, e.position.x, e.position.y, 32, 32) -- TODO: width and height
