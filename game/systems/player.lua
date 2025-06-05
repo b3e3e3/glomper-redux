@@ -1,20 +1,27 @@
+local PhysicsSystem = require 'game.systems.physics'
 local PlayerSystem = Concord.system({
-    movement = { "position", "velocity" },
-    input = { "controller" },
+    pool = { "controller", "position", "velocity", "physics" },
 })
+
+local function applyForce(e, x, y)
+    e.velocity.x = x or e.velocity.x
+    e.velocity.y = y or e.velocity.y
+end
+
 function PlayerSystem:update(dt)
-    local x, y = 0, 0
-
-    -- handle input
-    for _, e in ipairs(self.input) do
+    for _, e in ipairs(self.pool) do
         Input:update()
-        x, y = Input:get('move')
-        print(x, y)
-    end
+        local x, y = Input:get('move')
 
-    -- handle movement
-    for _, e in ipairs(self.movement) do
-        e.velocity.x, e.velocity.y = x * e.controller.speed, y * e.controller.speed
+        local xforce = x * e.controller.speed
+        local yforce = nil
+        if Input:down('jump') then
+            if PhysicsSystem.isGrounded(e) then
+                yforce = -400
+            end
+        end
+
+        applyForce(e, xforce, yforce)
     end
 end
 

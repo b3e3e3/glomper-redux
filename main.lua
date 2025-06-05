@@ -1,35 +1,56 @@
 Concord = require 'libraries.concord'
+bump = require 'libraries.bump'
 Input = require 'input'
+
+Game = {
+    bumpWorld = bump.newWorld()--64)
+}
 
 ECS = {
     c = Concord.components,
     a = {},
     s = {},
+    world = Concord.world(),
 }
+
+function ECS.world:onEntityAdded(e)
+    ECS.world:emit("onEntityAdded", e)
+end
+
+function ECS.world:onEntityRemoved(e)
+    ECS.world:emit("onEntityRemoved", e)
+end
 
 Concord.utils.loadNamespace("game/components")
 Concord.utils.loadNamespace("game/assemblages", ECS.a)
 Concord.utils.loadNamespace("game/systems", ECS.s)
 
-local world = Concord.world()
-world:addSystems( -- TODO: auomate this? or not?
-    ECS.s.move,
+ECS.world:addSystems( -- TODO: auomate this? or not?
+    -- ECS.s.move,
+    ECS.s.physics,
     ECS.s.player,
     ECS.s.testdraw
 )
 
 local playerEntity =
-    Concord.entity(world)
+    Concord.entity(ECS.world)
     :assemble(ECS.a.player)
 
 function love.load()
-    world:emit("init")
+    ECS.world:emit("init")
+
+    -- HACK: create floor
+    Game.bumpWorld:add(
+        { isSolid = true },
+        0, love.graphics.getHeight() - 100,
+        love.graphics.getWidth(), 100
+    )
 end
 
 function love.update(dt)
-    world:emit("update", dt)
+    ECS.world:emit("update", dt)
 end
 
 function love.draw()
-    world:emit("draw")
+    ECS.world:emit("draw")
 end
