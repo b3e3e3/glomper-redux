@@ -85,6 +85,7 @@ function PhysicsSystem:update(dt)
         e.position.x, e.position.y = actualX, actualY
         Game.bumpWorld:update(e, e.position.x, e.position.y)
     end
+    if Input:pressed("jump") then ECS.world:emit("freeze") end
 
     for _, e in ipairs(self.pool) do
         if e.physics.isFrozen then goto continue end
