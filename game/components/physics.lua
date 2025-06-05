@@ -1,11 +1,25 @@
 local coord2 = function(c, x, y)
     c.x = x or 0
     c.y = y or 0
+
+    function c:set(x, y)
+        self.x = x or self.x
+        self.y = y or self.y
+    end
+
+    function c:apply(x, y)
+        self.x = self.x + (x or 0)
+        self.y = self.y + (y or 0)
+    end
 end
 
-local physics = Concord.component("physics", function(c, isSolid)
+Concord.component("physics", function(c, isSolid, gravity)
+    c.gravity = gravity or -9.8
+    
     c.isSolid = isSolid or true
+    c.isFrozen = false
 end)
 
 Concord.component("position", coord2)
+
 Concord.component("velocity", coord2)

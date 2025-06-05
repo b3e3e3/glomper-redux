@@ -6,7 +6,7 @@ local input = baton.new {
         right = {'key:right', 'key:d'},
         up = {'key:up', 'key:w'},
         down = {'key:down', 'key:s'},
-        jump = {'key:space', 'key:w'},
+        jump = {'key:space', 'key:w', 'key:up'},
     },
     pairs = {
         move = {'left', 'right', 'up', 'down'}

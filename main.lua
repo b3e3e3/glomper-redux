@@ -26,10 +26,10 @@ Concord.utils.loadNamespace("game/assemblages", ECS.a)
 Concord.utils.loadNamespace("game/systems", ECS.s)
 
 ECS.world:addSystems( -- TODO: auomate this? or not?
-    -- ECS.s.move,
     ECS.s.physics,
     ECS.s.player,
-    ECS.s.testdraw
+    ECS.s.testdraw,
+    ECS.s.glomp
 )
 
 local playerEntity =
