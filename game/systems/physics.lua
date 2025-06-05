@@ -1,3 +1,4 @@
+local input = require "input"
 local PhysicsSystem = Concord.system({
     pool = { "physics", "velocity" },
 })
@@ -22,9 +23,13 @@ function PhysicsSystem:init()
     end
 end
 
+function PhysicsSystem.getCols(e, xOffset, yOffset)
+    local _, _, cols = Game.bumpWorld:check(e, e.position.x + (xOffset or 0), e.position.y + (yOffset or 0))
+    return cols
+end
+
 function PhysicsSystem.isGrounded(e) -- TODO: better refactor for this
-    local _, _, cols = Game.bumpWorld:check(e, e.position.x, e.position.y + 1)
-    return #cols > 0
+    return #PhysicsSystem.getCols(e, 0, 1) > 0
 end
 
 function PhysicsSystem:jump(e)
@@ -37,27 +42,40 @@ function PhysicsSystem:jump(e)
     end
 end
 
+function PhysicsSystem:freeze(e)
+    local function freeze(e)
+        e.physics.isFrozen = not e.physics.isFrozen
+    end
+    if e == nil then
+        for _, v in ipairs(self.pool) do
+            freeze(v)
+        end
+    else
+        freeze(e)
+    end
+
+end
+
 function PhysicsSystem:update(dt)
     local function calculateGoalPos(pos, vel)
         return pos.x + vel.x * dt, pos.y + vel.y * dt
     end
 
     local function applyGravity(e)
+
         e.velocity:apply(nil, -e.physics.gravity)
     end
 
     local function moveAndCollide(e)
-        local goalX, goalY = calculateGoalPos(e.position, e.velocity)
-        local actualX, actualY, cols = Game.bumpWorld:check(e, goalX, goalY)
-
-        for _, v in ipairs(cols) do
-            if v ~= e then
-                if not v.other.isSolid then
-                    actualX, actualY = goalX, goalY
-                    break
-                end
+        local solidFilter = function(_, other)
+            if not other.isSolid then
+                return 'cross'
             end
+            return 'slide'
         end
+        
+        local goalX, goalY = calculateGoalPos(e.position, e.velocity)
+        local actualX, actualY, cols = Game.bumpWorld:check(e, goalX, goalY, solidFilter)
 
         -- if we are trying to fall but can't, we've landed on a surface
         if actualY ~= goalY and e.velocity.y > 0 then
@@ -69,11 +87,31 @@ function PhysicsSystem:update(dt)
     end
 
     for _, e in ipairs(self.pool) do
+        if e.physics.isFrozen then goto continue end
         if not self.isGrounded(e) then
             applyGravity(e)
         end
 
         moveAndCollide(e)
+        ::continue::
+    end
+end
+
+function PhysicsSystem:draw()
+    for _, e in ipairs(self.pool) do
+        if Game.bumpWorld:hasItem(e) then
+            love.graphics.push()
+
+            local x, y = Game.bumpWorld:getRect(e)
+            love.graphics.print(string.format("vel: %s, %s", e.velocity.x, e.velocity.y), x, y - 32)
+            love.graphics.print(string.format("pos: %s, %s", e.position.x, e.position.y), x, y - 48)
+            love.graphics.print(string.format("rect: %s, %s", x, y), x, y - 64)
+            love.graphics.print(string.format("isSolid: %s", e.physics.isSolid), x, y - 80)
+            love.graphics.print(string.format("isFrozen: %s", e.physics.isFrozen), x, y - 96)
+            love.graphics.print(string.format("cols: %s", #self.getCols(e, 0, 1)), x, y - 112)
+
+            love.graphics.pop()
+        end
     end
 end
 
