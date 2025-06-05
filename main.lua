@@ -1,27 +1,35 @@
-require "player"
-require "controller"
+Concord = require 'libraries.concord'
+Input = require 'input'
+
+ECS = {
+    c = Concord.components,
+    a = {},
+    s = {},
+}
+
+Concord.utils.loadNamespace("game/components")
+Concord.utils.loadNamespace("game/assemblages", ECS.a)
+Concord.utils.loadNamespace("game/systems", ECS.s)
+
+local world = Concord.world()
+world:addSystems( -- TODO: auomate this? or not?
+    ECS.s.move,
+    ECS.s.player,
+    ECS.s.testdraw
+)
+
+local playerEntity =
+    Concord.entity(world)
+    :assemble(ECS.a.player)
 
 function love.load()
-    player = PlayerObject(20, 20)
-    controller = Controller(player)
-
-    for i,v in pairs(Objects) do
-        v:load()
-    end
+    world:emit("init")
 end
 
 function love.update(dt)
-    for i,v in pairs(Objects) do
-        v:update(dt)
-    end
+    world:emit("update", dt)
 end
 
 function love.draw()
-    for i,v in pairs(Objects) do
-        v:draw()
-    end
-
-    love.graphics.setColor(1,1,1)
-    love.graphics.setNewFont(24)
-    love.graphics.print("Objects: " .. #Objects, 16, 16)
+    world:emit("draw")
 end
