@@ -3,6 +3,14 @@ local PhysicsSystem = Concord.system({
     pool = { "physics", "velocity" },
 })
 
+
+local solidFilter = function(item, other)
+    if item.physics.isSolid ~= true then
+        return 'cross'
+    end
+    return 'slide'
+end
+
 function PhysicsSystem:onEntityAdded(e)
     if not self.pool:has(e) then return end
     if Game.bumpWorld:hasItem(e) then return end
@@ -23,20 +31,20 @@ function PhysicsSystem:init()
     end
 end
 
-function PhysicsSystem:getCols(e, xOffset, yOffset)
-    local _, _, cols = self.checkCollision(e, e.position.x + (xOffset or 0), e.position.y + (yOffset or 0))
+function PhysicsSystem:getCols(e, xOffset, yOffset, filter)
+    local _, _, cols = self.checkCollision(e, e.position.x + (xOffset or 0), e.position.y + (yOffset or 0), filter)
     return cols
 end
 
 function PhysicsSystem.isGrounded(e) -- TODO: better refactor for this
-    return #PhysicsSystem:getCols(e, 0, 1) > 0
+    return #PhysicsSystem:getCols(e, 0, 1, solidFilter) > 0
 end
 
 function PhysicsSystem:jump(e)
     for _, v in ipairs(self.pool) do
         if e == v then
             if self.isGrounded(e) then
-                e.velocity.y = e.controller.jumpForce
+                e.velocity.y = -e.controller.jumpForce
             end
         end
     end
@@ -58,16 +66,6 @@ end
 
 
 function PhysicsSystem.checkCollision(e, goalX, goalY, filter)
-    local count = 0
-    local solidFilter = function(item, other)
-        count = count+1
-        if e.physics.isSolid ~= true or item.physics.isSolid ~= true then
-            print(string.format('%s. nil %s', count, item:has("controller")))
-            return 'cross'
-        end
-        return 'slide'
-    end
-
     return Game.bumpWorld:check(e, goalX, goalY, filter or solidFilter)
 end
 

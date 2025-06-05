@@ -15,8 +15,7 @@ end
 
 Concord.component("physics", function(c, isSolid, gravity)
     c.gravity = gravity or -9.8
-    
-    c.isSolid = isSolid or true
+    c.isSolid = isSolid == nil or isSolid -- defaults to true if isSolid is nil
     c.isFrozen = false
 end)
 

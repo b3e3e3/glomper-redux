@@ -4,7 +4,17 @@ local GlompSystem = Concord.system({
 })
 
 function GlompSystem:update(dt)
+    for _, e in ipairs(self.glomper) do
+        local glompFilter = function(item, other)
+            if item:has("glompable") then
+                print("glompable item!")
+                return 'touch'
+            end
 
+            return nil
+        end
+        local actualX, actualY, cols = Game.bumpWorld:check(e, e.position.x, e.position.y + 1, glompFilter)
+    end
 end
 
 function GlompSystem:draw()
