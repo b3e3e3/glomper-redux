@@ -7,15 +7,21 @@ local TestDrawSystem = Concord.system({
 })
 
 function TestDrawSystem.drawInfoText(e, lineHeight)
-    lineHeight = lineHeight or 32
-    local count = 0
+    lineHeight = lineHeight or 16
+    local count = 1
     for _, c in pairs(e:getComponents()) do
         if not c.getInfoText then goto continue end
+        
         love.graphics.push()
+
+        -- print("Drawing count " .. count .. " for component " .. c:getName())
 
         local res = c.getInfoText(e)
 
         local doDraw = function(str)
+            if not str or str == "" then return end
+            count = count + 1
+            -- print("Drawing " .. str .. ' at ' .. e.position.x .. ', ' .. e.position.y - (lineHeight*count))
             love.graphics.print(
                 str,
                 e.position.x or 0, (e.position.y or 0) - (lineHeight * count)
@@ -32,7 +38,6 @@ function TestDrawSystem.drawInfoText(e, lineHeight)
         end
 
         love.graphics.pop()
-        count = count + 1
 
         ::continue::
     end

@@ -20,19 +20,11 @@ Concord.utils.loadNamespace("game/assemblages", ECS.a)
 Concord.utils.loadNamespace("game/systems", ECS.s)
 
 ECS.world:addSystems( -- TODO: auomate this? or not?
+    ECS.s.glomp,
     ECS.s.physics,
     ECS.s.player,
-    ECS.s.testdraw,
-    ECS.s.glomp
+    ECS.s.testdraw
 )
-
-local playerEntity =
-    Concord.entity(ECS.world)
-    :assemble(ECS.a.player)
-
-local testObject = Concord.entity(ECS.world)
-:assemble(ECS.a.physicsbody, love.graphics.getWidth() / 4)
-:give("testdraw")
 
 function ECS.world:onEntityAdded(e)
     ECS.world:emit("onEntityAdded", e)
@@ -45,15 +37,18 @@ end
 function love.load()
     ECS.world:emit("init")
 
-    -- HACK: create floor
+    local playerEntity =
+    Concord.entity(ECS.world)
+    :assemble(ECS.a.player)
+
+    local testObject = Concord.entity(ECS.world)
+    :assemble(ECS.a.physicsbody, love.graphics.getWidth() / 4)
+    :give("glompable")
+    :give("testdraw")
+
     local floor = Concord.entity(ECS.world)
     :assemble(ECS.a.staticbody, 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), 100)
     :give("testdraw")
-    -- Game.bumpWorld:add(
-    --     { isSolid = true },
-    --     ,
-    --     love.graphics.getWidth(), 100
-    -- )
 end
 
 function love.update(dt)

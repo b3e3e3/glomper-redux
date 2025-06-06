@@ -26,22 +26,27 @@ local physics = Concord.component("physics", function(c, isSolid, gravity)
     c.isFrozen = false
 end)
 TestDraw.giveInfoText(physics, function(e)
-    local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
-    local _, _, cols = Game.Physics.checkCollision(e, goalX, goalY)
-    if #cols > 1 then
-        love.graphics.setColor(0, 1, 0)
-    else
-        love.graphics.setColor(1, 0, 0)
-    end
-
-    local x, y, _, _ = Game.bumpWorld:getRect(e)
-
-    return {
-        string.format("rect: %s, %s", x, y),
-        string.format("cols: %s", #cols),
+    local texts = {
         string.format("isSolid: %s", e.physics.isSolid),
         string.format("isFrozen: %s", e.physics.isFrozen),
     }
+
+    -- TODO: this sucks and we need to make this a system somehow
+    if (e:has('position') and e:has('velocity')) then
+        local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
+        local _, _, cols = Game.Physics.checkCollision(e, goalX, goalY)
+        if #cols > 1 then
+            love.graphics.setColor(0, 1, 0)
+        else
+            love.graphics.setColor(1, 0, 0)
+        end
+        
+        local x, y, _, _ = Game.bumpWorld:getRect(e)
+        table.insert(texts, string.format("rect: %s, %s", x, y))
+        table.insert(texts, string.format("cols: %s", #cols))
+    end
+
+    return texts
 end)
 
 local position = Concord.component("position", coord2)

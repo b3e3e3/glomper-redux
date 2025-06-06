@@ -4,8 +4,9 @@ local GlompSystem = Concord.system({
 })
 
 function GlompSystem:update(dt)
-    for _, e in ipairs(self.glompable) do
+    for _, e in ipairs(self.glomper) do
         local function glompFilter(item, other)
+            if not other:has("glompable") then return nil end
             return 'touch'
         end
 
@@ -15,7 +16,7 @@ function GlompSystem:update(dt)
                 glompFilter
             )
         for _, c in ipairs(cols) do
-            print(c.position.x, c.position.y)
+            print(c.other.position.x, c.other.position.y)
         end
     end
 
@@ -29,12 +30,12 @@ function GlompSystem:draw()
     for _, e in ipairs(self.glompable) do
         love.graphics.setColor(1, 1, 0)
         love.graphics.circle("fill", e.position.x, e.position.y, 2)
-        love.graphics.print("glompable", e.position.x, e.position.y - 16)
+        -- love.graphics.print("glompable", e.position.x, e.position.y - 16)
     end
     for _, e in ipairs(self.glomper) do
         love.graphics.setColor(1, 0, 0)
         love.graphics.circle("fill", e.position.x, e.position.y, 2)
-        love.graphics.print("glomper", e.position.x, e.position.y - 16)
+        -- love.graphics.print("glomper", e.position.x, e.position.y - 16)
     end
     love.graphics.pop()
 end
