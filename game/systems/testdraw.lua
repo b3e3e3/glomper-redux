@@ -11,7 +11,7 @@ function TestDrawSystem.drawInfoText(e, lineHeight)
     local count = 1
     for _, c in pairs(e:getComponents()) do
         if not c.getInfoText then goto continue end
-        
+
         love.graphics.push()
 
         -- print("Drawing count " .. count .. " for component " .. c:getName())
@@ -91,7 +91,20 @@ function TestDrawSystem:draw()
     self:drawPhysics()
 
     for _, e in ipairs(self.all) do
-        TestDrawSystem.drawInfoText(e)
+        local items = Game.bumpWorld:queryPoint(love.mouse.getX(), love.mouse.getY())
+        local shouldDraw = not e.testdraw.infoOnHover
+        
+        if e.testdraw.infoOnHover and #items > 0 then
+            for _, i in ipairs(items) do
+                if e == i then
+                    shouldDraw = true
+                end
+            end
+        end
+
+        if shouldDraw then
+            TestDrawSystem.drawInfoText(e)
+        end
     end
 end
 
