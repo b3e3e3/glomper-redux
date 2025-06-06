@@ -63,7 +63,7 @@ function PhysicsSystem:update(dt)
     end
 
     for _, e in ipairs(self.all) do
-        if e.physics.isFrozen then goto continue end
+        -- if e.physics.isFrozen then goto continue end
         
         Game.bumpWorld:update(e, e.position.x, e.position.y)
 

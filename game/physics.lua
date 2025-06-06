@@ -10,6 +10,22 @@ Physics.filters = {
 }
 Physics.filters.default = Physics.filters.solid
 
+function Physics.newHitbox(w, h, xoffset, yoffset)
+    local hitbox = {
+        width = w,
+        height = h,
+        xoffset = xoffset,
+        yoffset = yoffset,
+
+        
+    }
+    function hitbox:getOffsetPos(baseX, baseY)
+        return baseX + self.xoffset, baseY + self.yoffset
+    end
+
+    return hitbox
+end
+
 function Physics.calculateGoalPos(pos, vel, dt)
     dt = dt or love.timer.getDelta()
     return pos.x + vel.x * dt, pos.y + vel.y * dt

@@ -1,27 +1,28 @@
 local GlompSystem = Concord.system({
     glompable = { "glompable", "position", "physics" },
-    glomper = { "controller", "position", "physics" }
+    glomper = { "glomper", "position", "physics" }
 })
+
+local oldPlayer = nil
 
 function GlompSystem:update(dt)
     for _, e in ipairs(self.glomper) do
-        local function glompFilter(item, other)
-            if not other:has("glompable") then return nil end
+        local function glompFilter(item)
+            if not item:has("glompable") then return nil end
             return 'touch'
         end
 
-        local actualX, actualY, cols =
-            Game.Physics.checkCollision(
-                e, e.position.x, e.position.y + 1,
-                glompFilter
-            )
-        for _, c in ipairs(cols) do
-            print(c.other.position.x, c.other.position.y)
+        local x, y = e.glomper.hitbox:getOffsetPos(e.position.x, e.position.y)
+        local items, cols = Game.bumpWorld:queryRect(
+            x, y,
+            e.glomper.hitbox.width,
+            e.glomper.hitbox.height,
+            glompFilter
+        )
+        for _, i in ipairs(items) do
+            -- print(c.other.position.x, c.other.position.y)
+            ECS.world:emit("glomp", e, i)
         end
-    end
-
-    for _, e in ipairs(self.glomper) do
-
     end
 end
 
@@ -30,12 +31,22 @@ function GlompSystem:draw()
     for _, e in ipairs(self.glompable) do
         love.graphics.setColor(1, 1, 0)
         love.graphics.circle("fill", e.position.x, e.position.y, 2)
-        -- love.graphics.print("glompable", e.position.x, e.position.y - 16)
+        if e.glompable.other then
+            love.graphics.rectangle("fill", e.position.x, e.position.y - e.size.h, e.size.w, e.size.h)
+        end
     end
+
     for _, e in ipairs(self.glomper) do
         love.graphics.setColor(1, 0, 0)
         love.graphics.circle("fill", e.position.x, e.position.y, 2)
-        -- love.graphics.print("glomper", e.position.x, e.position.y - 16)
+
+        local x, y = e.glomper.hitbox:getOffsetPos(e.position.x, e.position.y)
+
+        love.graphics.rectangle(
+            "line",
+            x,
+            y,
+            e.glomper.hitbox.width, e.glomper.hitbox.height)
     end
     love.graphics.pop()
 end

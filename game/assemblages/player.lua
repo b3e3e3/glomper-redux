@@ -3,5 +3,6 @@ return function(e, x, y)
     e
     :assemble(ECS.a.character)
     :give("controller")--, 400)
+    :give("glomper")
     :give("testdraw")
 end
