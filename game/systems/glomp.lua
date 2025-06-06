@@ -6,8 +6,6 @@ local GlompSystem = Concord.system({
 function GlompSystem:update(dt)
     for _, e in ipairs(self.glompable) do
         local function glompFilter(item, other)
-            if other == e then return nil end
-            if other == item then return nil end
             return 'touch'
         end
 

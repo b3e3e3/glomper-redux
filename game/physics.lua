@@ -2,13 +2,18 @@ local Physics = {}
 
 Physics.filters = {
     solid = function(item, other)
-        if item.physics.isSolid ~= true then
+        if other.physics.isSolid ~= true then
             return 'cross'
         end
         return 'slide'
     end,
 }
 Physics.filters.default = Physics.filters.solid
+
+function Physics.calculateGoalPos(pos, vel, dt)
+    dt = dt or love.timer.getDelta()
+    return pos.x + vel.x * dt, pos.y + vel.y * dt
+end
 
 function Physics.checkCollision(e, goalX, goalY, filter)
     return Game.bumpWorld:check(e, goalX, goalY, filter or Physics.filters.default)
