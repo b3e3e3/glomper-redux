@@ -13,6 +13,11 @@ local coord2 = function(c, x, y)
     end
 end
 
+Concord.component("size", function(c, w, h)
+    c.w = w or 32
+    c.h = h or 32
+end)
+
 Concord.component("physics", function(c, isSolid, gravity)
     c.gravity = gravity or -9.8
     c.isSolid = isSolid == nil or isSolid -- defaults to true if isSolid is nil

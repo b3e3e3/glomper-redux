@@ -2,13 +2,23 @@ local PlayerSystem = Concord.system({
     pool = { "controller", "position", "velocity", "physics" },
 })
 
+function PlayerSystem:jump(e)
+    for _, v in ipairs(self.pool) do
+        if e == v then
+            if Game.Physics.isGrounded(e) then
+                e.velocity.y = -e.controller.jumpForce
+            end
+        end
+    end
+end
+
 function PlayerSystem:update(dt)
-    Input:update()
+    Game.Input:update()
     for _, e in ipairs(self.pool) do
-        local x, _ = Input:get('move')
+        local x, _ = Game.Input:get('move')
 
         local xforce = x * e.controller.speed
-        if Input:down('jump') then
+        if Game.Input:down('jump') then
             ECS.world:emit('jump', e)
         end
 
