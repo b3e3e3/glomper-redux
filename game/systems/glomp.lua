@@ -4,14 +4,18 @@ local GlompSystem = Concord.system({
 })
 
 function GlompSystem:update(dt)
-    local touchQueue = {}
     for _, e in ipairs(self.glompable) do
-        local actualX, actualY, cols = Game.Physics.checkCollision(e, e.position.x, e.position.y + 1,
-            function(item, other)
-                if other == e then return nil end
-                if other == item then return nil end
-                return 'touch'
-            end)
+        local function glompFilter(item, other)
+            if other == e then return nil end
+            if other == item then return nil end
+            return 'touch'
+        end
+
+        local actualX, actualY, cols =
+            Game.Physics.checkCollision(
+                e, e.position.x, e.position.y + 1,
+                glompFilter
+            )
         for _, c in ipairs(cols) do
             print(c.position.x, c.position.y)
         end
