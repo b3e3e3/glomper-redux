@@ -61,6 +61,8 @@ end
 
 function love.update(dt)
     ECS.world:emit("update", dt)
+    
+    Game.Input:update()
     Timer.update(dt)
 end
 
