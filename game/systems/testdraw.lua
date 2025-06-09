@@ -3,8 +3,34 @@ require 'game.systems.physics'
 local TestDrawSystem = Concord.system({
     all = { "testdraw" },
     pool = { "testdraw", "position", "size" },
-    physics = { "testdraw", "physics", "position" }
+    physics = { "testdraw", "physics", "position" },
+    glompsprite = { "glompsprite", "position", "size" },
 })
+
+-- TODO: standardize draw components
+function TestDrawSystem:show(e)
+    if e ~= nil then
+        if not e:has("testdraw") then return end
+        if e.testdraw ~= self then return end
+    end
+
+    self.visible = true
+end
+
+function TestDrawSystem:hide(e)
+    if e ~= nil then
+        if not e:has("testdraw") then return end
+        if e.testdraw ~= self then return end
+    end
+
+    self.visible = false
+end
+
+function TestDrawSystem:glomp(by, other)
+    print("Glomped")
+    if not by:has("testdraw") then return end
+    by.testdraw.visible = false
+end
 
 function TestDrawSystem.drawInfoText(e, lineHeight)
     lineHeight = lineHeight or 16
@@ -43,52 +69,37 @@ function TestDrawSystem.drawInfoText(e, lineHeight)
     end
 end
 
-function TestDrawSystem:drawPhysics()
-    for _, e in ipairs(self.physics) do
-        if Game.bumpWorld:hasItem(e) then
-            love.graphics.push()
-
-            -- local x, y, w, h = Game.bumpWorld:getRect(e)
-            -- -- if e['has'] and e:has("velocity") then
-            -- if e:has("velocity") then
-            --     local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
-            --     local _, _, cols = Game.Physics.checkCollision(e, goalX, goalY)
-            --     print(#cols)
-            --     if #cols > 1 then
-            --         love.graphics.setColor(0, 1, 0)
-            --     else
-            --         love.graphics.setColor(1, 0, 0)
-            --     end
-            --     love.graphics.print(string.format("cols: %s", #cols), x, y - 112)
-            -- end
-
-            -- love.graphics.print(string.format("vel: %s, %s", e.velocity.x, e.velocity.y), x, y - 32)
-            -- love.graphics.print(string.format("pos: %s, %s", e.position.x, e.position.y), x, y - 48)
-            -- love.graphics.print(string.format("rect: %s, %s", x, y), x, y - 64)
-            -- love.graphics.print(string.format("isSolid: %s", e.physics.isSolid), x, y - 80)
-            -- love.graphics.print(string.format("isFrozen: %s", e.physics.isFrozen), x, y - 96)
-
-            love.graphics.pop()
-        end
-    end
-end
-
 function TestDrawSystem:drawGraphic()
     for _, e in ipairs(self.pool) do
+        if not e.testdraw.visible then goto continue end
         love.graphics.push()
-        love.graphics.setColor(1, 1, 1)
+        if e:has("controller") then
+            love.graphics.setColor(1, 0, 1)
+        else
+            love.graphics.setColor(1, 1, 1)
+        end
         -- love.graphics.circle("fill", e.position.x, e.position.y, 16)
         love.graphics.rectangle("fill",
             e.position.x, e.position.y,
             e.size.w, e.size.h
         )
         love.graphics.pop()
+        ::continue::
     end
 end
 
 function TestDrawSystem:draw()
     self:drawGraphic()
-    self:drawPhysics()
+
+    for _, e in ipairs(self.glompsprite) do
+        love.graphics.setColor(1,1,0)
+        love.graphics.rectangle(
+            "fill",
+            e.position.x,
+            e.position.y - 32,
+            32, 32
+        )
+    end
 
     for _, e in ipairs(self.all) do
         local items = Game.bumpWorld:queryPoint(love.mouse.getX(), love.mouse.getY())

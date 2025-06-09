@@ -17,7 +17,13 @@ function PlayerSystem:update(dt)
     for _, e in ipairs(self.pool) do
         local x, _ = Game.Input:get('move')
 
-        local xforce = x * e.controller.speed
+        local speed = e.controller.speed
+
+        if not Game.Physics.isGrounded(e) then
+            speed = e.controller.airSpeed
+        end
+
+        local xforce = x * speed
         if Game.Input:down('jump') then
             ECS.world:emit('jump', e)
         end

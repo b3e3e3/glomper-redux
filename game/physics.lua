@@ -2,6 +2,7 @@ local Physics = {}
 
 Physics.filters = {
     solid = function(item, other)
+        if not other:has("physics") then return nil end
         if other.physics.isSolid ~= true then
             return 'cross'
         end

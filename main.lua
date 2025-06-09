@@ -1,11 +1,18 @@
-Concord = require 'libraries.concord'
+local Timer = require 'libraries.knife.timer'
+
 Bump = require 'libraries.bump'
+Concord = require 'libraries.concord'
 
 Game = {
-    bumpWorld = Bump.newWorld(),--64),
+    bumpWorld = Bump.newWorld(), --64),
     Input = require 'game.input',
     Physics = require 'game.physics',
 }
+
+function Game.createPlayer(x, y)
+    return Concord.entity(ECS.world)
+        :assemble(ECS.a.player, x, y)
+end
 
 ECS = {
     c = Concord.components,
@@ -23,7 +30,8 @@ ECS.world:addSystems( -- TODO: auomate this? or not?
     ECS.s.glomp,
     ECS.s.physics,
     ECS.s.player,
-    ECS.s.testdraw
+    ECS.s.testdraw,
+    ECS.s.projectile
 )
 
 function ECS.world:onEntityAdded(e)
@@ -37,22 +45,21 @@ end
 function love.load()
     ECS.world:emit("init")
 
-    local playerEntity =
-    Concord.entity(ECS.world)
-    :assemble(ECS.a.player)
+    local playerEntity = Game.createPlayer(nil, love.graphics.getHeight() - 132)
 
     local testObject = Concord.entity(ECS.world)
-    :assemble(ECS.a.physicsbody, love.graphics.getWidth() / 4)
-    :give("glompable")
-    :give("testdraw")
+        :assemble(ECS.a.physicsbody, love.graphics.getWidth() / 4)
+        :give("glompable")
+        :give("testdraw")
 
     local floor = Concord.entity(ECS.world)
-    :assemble(ECS.a.staticbody, 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), 100)
-    :give("testdraw")
+        :assemble(ECS.a.staticbody, 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), 100)
+        :give("testdraw")
 end
 
 function love.update(dt)
     ECS.world:emit("update", dt)
+    Timer.update(dt)
 end
 
 function love.draw()

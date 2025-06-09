@@ -10,8 +10,8 @@ function PhysicsSystem:onEntityAdded(e)
 end
 
 function PhysicsSystem:onEntityRemoved(e)
-    if not self.physbody:has(e) then return end
     if not Game.bumpWorld:hasItem(e) then return end
+
     Game.bumpWorld:remove(e)
 end
 
