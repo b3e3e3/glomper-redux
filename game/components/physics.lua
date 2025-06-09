@@ -4,14 +4,14 @@ local coord2 = function(c, x, y)
     c.x = x or 0
     c.y = y or 0
 
-    function c:set(x, y)
-        self.x = x or self.x
-        self.y = y or self.y
+    function c:set(_x, _y)
+        self.x = _x or self.x
+        self.y = _y or self.y
     end
 
-    function c:apply(x, y)
-        self.x = self.x + (x or 0)
-        self.y = self.y + (y or 0)
+    function c:apply(_x, _y)
+        self.x = self.x + (_x or 0)
+        self.y = self.y + (_y or 0)
     end
 end
 

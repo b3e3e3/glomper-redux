@@ -1,5 +1,3 @@
-local Timer = require 'libraries.knife.timer'
-
 local GlompSystem = Concord.system({
     glompable = { "glompable", "position", "physics" },
     glomper = { "glomper", "position", "physics" },

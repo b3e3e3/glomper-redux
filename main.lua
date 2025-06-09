@@ -1,6 +1,6 @@
 local Timer = require 'libraries.knife.timer'
 
-require 'util'
+local _ = require 'util'
 
 Bump = require 'libraries.bump'
 Concord = require 'libraries.concord'

@@ -1,14 +1,12 @@
-local Memoize = require 'libraries.knife.Memoize'
-
 local PlayerSystem = Concord.system({
     pool = { "controller", "position", "velocity", "physics" },
 })
 
 local tempAccel = 8
 local tempDecel = 16
+
 local tempReverseAccelMod = 2
 local tempAirAccelMod = 0.8
-
 local tempSprintSpeedMod = 1.76
 
 function PlayerSystem.getMaxSpeed(e)
