@@ -40,7 +40,7 @@ function PhysicsSystem:update(dt)
 
     local function moveAndCollide(e)       
         local goalX, goalY = calculateGoalPos(e)
-        local actualX, actualY, cols = Game.Physics.checkCollision(e, goalX, goalY)
+        local actualX, actualY = Game.Physics.checkCollision(e, goalX, goalY)
 
         -- if we are trying to fall but can't, we've landed on a surface
         if actualY ~= goalY and e.velocity.y > 0 then
@@ -48,7 +48,6 @@ function PhysicsSystem:update(dt)
         end
 
         e.position.x, e.position.y = actualX, actualY
-        -- Game.bumpWorld:update(e, e.position.x, e.position.y)
     end
 
     for _, e in ipairs(self.physbody) do
@@ -63,11 +62,7 @@ function PhysicsSystem:update(dt)
     end
 
     for _, e in ipairs(self.all) do
-        -- if e.physics.isFrozen then goto continue end
-        
         Game.bumpWorld:update(e, e.position.x, e.position.y)
-
-        ::continue::
     end
 end
 

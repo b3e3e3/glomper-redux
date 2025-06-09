@@ -33,20 +33,12 @@ end
 function GlompSystem:throw(e)
     local player = Game.createPlayer(e.position.x, e.position.y)
     ECS.world:removeEntity(e)
-    -- TODO: assemblage
     local projectile = Concord.entity(ECS.world)
-    :assemble("projectile",
+    :assemble(ECS.a.projectile,
         e.position.x + 32,
         e.position.y
     )
     :give("testdraw")
-    -- :give("position",
-    -- e.position.x + 32,
-    -- e.position.y
-    -- )
-    -- :give("size")
-    -- :give("projectile")
-    -- :give("testdraw")
 
     player.physics.isFrozen = true
     player.position.y = e.position.y - 32
