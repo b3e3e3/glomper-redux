@@ -30,23 +30,38 @@ function GlompSystem:jump(e)
     ECS.world:emit("throw", e)
 end
 
+-- GLOMP:
+-- 1. when glompable is glomped, give glompable "glomped" component
+-- 2. remove player entity
+-- 3. give controller and glompsprite to the glompable (with mult'd values from player)
+--
+-- wait for jump, emit throw, then:
+-- 1. create player again
+-- 2. remove glompable entity
+-- 3. create projectile where glompable was (basically)
+-- 4. freeze the player for 0.3 seconds and then unfreeze
+
+-- FUTURE ISSUES :(
+-- * (BIG) what if the player holds important information that can't be recreated after removal?
+-- * what if freezing the physics system isn't deep enough?
+
 function GlompSystem:throw(e)
-    local player = Game.createPlayer(e.position.x, e.position.y)
+    local by = Game.createPlayer(e.position.x, e.position.y)
     ECS.world:removeEntity(e)
+
     local projectile = Concord.entity(ECS.world)
     :assemble(ECS.a.projectile,
         e.position.x + 32,
-        e.position.y
+        e.position.y,
+        e.size.x, e.size.y
     )
     :give("testdraw")
-
-    player.physics.isFrozen = true
-    player.position.y = e.position.y - 32
-
-    -- TODO: wait for animation
-    Timer.after(0.3, function()
-        player.physics.isFrozen = false
-    end)
+    projectile.projectile.onFinished = function()
+        by.physics.isFrozen = false
+    end
+    
+    by.physics.isFrozen = true
+    by.position.y = e.position.y - 32
 end
 
 -- GLOMPABLE

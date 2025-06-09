@@ -40,6 +40,8 @@ function TestDrawSystem.drawInfoText(e, lineHeight)
 
         love.graphics.push()
 
+        love.graphics.setColor(1, 0, 0)
+
         -- print("Drawing count " .. count .. " for component " .. c:getName())
 
         local res = c.getInfoText(e)
