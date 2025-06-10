@@ -80,9 +80,14 @@ function TestDrawSystem:drawGraphic()
         else
             love.graphics.setColor(1, 1, 1)
         end
-        -- love.graphics.circle("fill", e.position.x, e.position.y, 16)
+        
+        love.graphics.translate(e.position.x + e.size.w / 2, e.position.y + e.size.h / 2)
+        love.graphics.rotate(math.pi/2)
+        love.graphics.translate(-e.size.w / 2, -e.size.h / 2)
+
         love.graphics.rectangle("fill",
-            e.position.x, e.position.y,
+            0,0,    
+        -- e.position.x, e.position.y,
             e.size.w, e.size.h
         )
         love.graphics.pop()

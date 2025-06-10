@@ -2,14 +2,23 @@ local Physics = {}
 
 Physics.filters = {
     solid = function(item, other)
-        if not other:has("physics") then return nil end
-        if other.physics.isSolid ~= true then
+        if not item:has("physics") or not other:has("physics") then return nil end
+        if not item.physics.isSolid or not other.physics.isSolid then
             return 'cross'
         end
         return 'slide'
     end,
 }
 Physics.filters.default = Physics.filters.solid
+
+function Physics.isOnScreen(pos, size, margin)
+    margin = margin or 5
+    if pos.x + size.w < 0 + margin then return false
+    elseif pos.x > love.graphics.getWidth() - margin then return false
+    elseif pos.y + size.h < 0 + margin  then return false
+    elseif pos.y > love.graphics.getHeight() - margin then return false end
+    return true
+end
 
 function Physics.newHitbox(w, h, xoffset, yoffset)
     local hitbox = {

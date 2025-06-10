@@ -51,11 +51,14 @@ function GlompSystem:throw(e)
     :assemble(ECS.a.projectile,
         e.position.x + 32,
         e.position.y,
-        e.size.x, e.size.y
+        e.size.x, e.size.y,
+        e.direction.lastdir
     )
     :give("testdraw")
-    projectile.projectile.onFinished = function()
+    projectile.projectile.onFinished = function(projectile)
+        by.velocity.y = 0
         by.physics.isFrozen = false
+        ECS.world:removeEntity(projectile)
     end
     
     by.physics.isFrozen = true

@@ -1,5 +1,3 @@
-local Timer = require 'libraries.knife.timer'
-
 local _ = require 'util'
 
 Bump = require 'libraries.bump'
@@ -54,10 +52,12 @@ function love.load()
     --     :give("glompable")
     --     :give("testdraw")
     for i = 1, 5, 1 do
-        Concord.entity(ECS.world)
-        :assemble(ECS.a.physicsbody, (love.graphics.getWidth() / 4) + (i*64))
-        :give("glompable")
-        :give("testdraw")
+        if i ~= 3 then
+            Concord.entity(ECS.world)
+            :assemble(ECS.a.physicsbody, (love.graphics.getWidth() / 4) + (i*64))
+            :give("glompable")
+            :give("testdraw")
+        end
     end
 
     local floor = Concord.entity(ECS.world)
@@ -69,7 +69,6 @@ function love.update(dt)
     ECS.world:emit("update", dt)
     
     Game.Input:update()
-    Timer.update(dt)
 end
 
 function love.draw()

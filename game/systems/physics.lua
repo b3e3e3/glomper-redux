@@ -40,7 +40,13 @@ function PhysicsSystem:update(dt)
 
     local function moveAndCollide(e)       
         local goalX, goalY = calculateGoalPos(e)
-        local actualX, actualY = Game.Physics.checkCollision(e, goalX, goalY)
+        local actualX, actualY, cols = Game.Physics.checkCollision(e, goalX, goalY)
+
+        if #cols > 0 then
+            for _, c in pairs(cols) do
+                ECS.world:emit("collide", e, c.other)
+            end
+        end
 
         -- if we are trying to fall but can't, we've landed on a surface
         if actualY ~= goalY and e.velocity.y > 0 then

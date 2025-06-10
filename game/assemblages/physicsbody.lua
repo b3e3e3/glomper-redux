@@ -7,5 +7,6 @@ return function(e, x, y, w, h)
     )
     :ensure("size", w or 32, h or 32)
     :ensure("velocity", 0, 0)
+    :ensure("direction")
     :ensure("physics")
 end

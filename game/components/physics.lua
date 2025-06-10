@@ -58,3 +58,7 @@ local velocity = Concord.component("velocity", coord2)
 TestDraw.giveInfoText(velocity, function(e)
     return string.format("vel: %s, %s", e.velocity.x, e.velocity.y)
 end)
+
+local direction = Concord.component("direction", function(c, dir)
+    c.lastdir = dir or 1
+end)
