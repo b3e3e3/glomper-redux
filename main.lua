@@ -49,10 +49,16 @@ function love.load()
 
     local playerEntity = Game.createPlayer(nil, love.graphics.getHeight() - 132)
 
-    local testObject = Concord.entity(ECS.world)
-        :assemble(ECS.a.physicsbody, love.graphics.getWidth() / 4)
+    -- local testObject = Concord.entity(ECS.world)
+    --     :assemble(ECS.a.physicsbody, love.graphics.getWidth() / 4)
+    --     :give("glompable")
+    --     :give("testdraw")
+    for i = 1, 5, 1 do
+        Concord.entity(ECS.world)
+        :assemble(ECS.a.physicsbody, (love.graphics.getWidth() / 4) + (i*64))
         :give("glompable")
         :give("testdraw")
+    end
 
     local floor = Concord.entity(ECS.world)
         :assemble(ECS.a.staticbody, 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), 100)

@@ -20,4 +20,11 @@ function ProjectileSystem:update(dt)
     end
 end
 
+function ProjectileSystem:draw()
+    for _, e in ipairs(self.pool) do
+        love.graphics.setColor(1, 1, 0)
+        love.graphics.print("I am a projectile!!", e.position.x, e.position.y)
+    end
+end
+
 return ProjectileSystem
