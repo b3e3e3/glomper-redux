@@ -60,5 +60,5 @@ TestDraw.giveInfoText(velocity, function(e)
 end)
 
 local direction = Concord.component("direction", function(c, dir)
-    c.lastdir = dir or 1
+    c.last = dir or 1
 end)

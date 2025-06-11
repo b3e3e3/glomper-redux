@@ -55,7 +55,7 @@ function PlayerSystem:update(dt)
 
         e.velocity.x = xforce
         if e:has("direction") then
-            if x ~= 0 then e.direction.lastdir = x end
+            if x ~= 0 then e.direction.last = x end
         end
     end
 end

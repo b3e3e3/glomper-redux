@@ -14,6 +14,17 @@ function Game.createPlayer(x, y)
         :assemble(ECS.a.player, x, y)
 end
 
+function Game.createProjectile(e)
+    return Concord.entity(ECS.world)
+    :assemble(ECS.a.projectile,
+        e.position.x + 32,
+        e.position.y,
+        e.size.x, e.size.y,
+        e.direction.last
+    )
+    :give("testdraw")
+end
+
 ECS = {
     c = Concord.components,
     a = {},
