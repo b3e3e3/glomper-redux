@@ -1,19 +1,6 @@
-local flux = require 'libraries.flux'
 local ProjectileSystem = Concord.system({
     pool = { "projectile", "position", "direction", "size", "velocity" },
 })
-
--- function GlompSystem:collide(by, other)
---     if other:has("glompable") then
---         if by:has("projectile") and by.projectile.state == 'moving' then
---             local e = Game.createProjectile(other)
---             e.velocity.x = -by.velocity.x
---             e.direction.last = by.direction.last
-
---             ECS.world:removeEntity(other)
---         end
---     end
--- end
 
 function ProjectileSystem:collide(by, other)
     for _, e in ipairs(self.pool) do
