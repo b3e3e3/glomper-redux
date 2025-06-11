@@ -82,6 +82,20 @@ function love.load()
     local floor = Concord.entity(ECS.world)
         :assemble(ECS.a.staticbody, 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), 100)
         :give("testdraw")
+
+    local thickness = 32
+    local walls = {
+        Concord.entity(ECS.world)
+            :assemble(ECS.a.staticbody,
+            -thickness, 0,
+            thickness, love.graphics.getHeight()
+        ),
+        Concord.entity(ECS.world)
+            :assemble(ECS.a.staticbody,
+            love.graphics.getWidth(), 0,
+            thickness, love.graphics.getHeight()
+        )
+    }
 end
 
 function love.update(dt)
