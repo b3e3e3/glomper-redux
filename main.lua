@@ -3,6 +3,8 @@ local _ = require 'util'
 Bump = require 'libraries.bump'
 Concord = require 'libraries.concord'
 
+Gamestate = require 'libraries.hump.gamestate'
+
 Game = {
     bumpWorld = Bump.newWorld(), --64),
     Input = require 'game.input',
