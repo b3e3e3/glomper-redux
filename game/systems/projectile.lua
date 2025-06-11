@@ -5,14 +5,14 @@ local ProjectileSystem = Concord.system({
 
 function ProjectileSystem:collide(by, other)
     for _, e in ipairs(self.pool) do
-        if by == e then
-            
+        if by == e and e.projectile.state == 'moving' then
+            self.doCollide(e)
         end
     end
 end
 
 function ProjectileSystem.doCollide(e)
-    e.velocity.x = -e.velocity.x / 6
+    e.velocity.x = -e.velocity.x / 4
     e.velocity.y = -500
     e:give("physics", false, -20)
     e.projectile.state = 'collided'
@@ -36,6 +36,7 @@ function ProjectileSystem:update(dt)
             
         elseif e.projectile.state == 'spinout' then
             -- print(Game.Physics.isOnScreen(e.position, e.size))
+            e.testdraw.angle = e.testdraw.angle + 18 * dt
             if e.position.y < e.size.h or e.position.y > love.graphics.getHeight() then
                 e.projectile.state = 'finished'
             end

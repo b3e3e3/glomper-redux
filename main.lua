@@ -57,6 +57,14 @@ function love.load()
             :assemble(ECS.a.physicsbody, (love.graphics.getWidth() / 4) + (i*64))
             :give("glompable")
             :give("testdraw")
+
+            if i == 5 then
+                local e = Concord.entity(ECS.world)
+                :assemble(ECS.a.physicsbody, (love.graphics.getWidth() / 4) + (i*64))
+                :give("glompable")
+                :give("testdraw")
+                e.position.y = e.position.y - 32
+            end
         end
     end
 

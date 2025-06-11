@@ -82,7 +82,7 @@ function TestDrawSystem:drawGraphic()
         end
         
         love.graphics.translate(e.position.x + e.size.w / 2, e.position.y + e.size.h / 2)
-        love.graphics.rotate(math.pi/2)
+        love.graphics.rotate(e.testdraw.angle)
         love.graphics.translate(-e.size.w / 2, -e.size.h / 2)
 
         love.graphics.rectangle("fill",
