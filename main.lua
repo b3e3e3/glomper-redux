@@ -55,7 +55,8 @@ function ECS.world:onEntityRemoved(e)
     ECS.world:emit("onEntityRemoved", e)
 end
 
-function love.load()
+local gameState = {}
+function gameState:enter()
     ECS.world:emit("init")
 
     local playerEntity = Game.createPlayer(nil, love.graphics.getHeight() - 132)
@@ -86,12 +87,27 @@ function love.load()
         :give("testdraw")
 end
 
-function love.update(dt)
+function gameState:update(dt)
     ECS.world:emit("update", dt)
-    
-    Game.Input:update()
 end
 
-function love.draw()
+function gameState:draw()
     ECS.world:emit("draw")
+end
+
+local menuState = {}
+function menuState:draw()
+    if Game.Input:pressed('confirm') then Gamestate.switch(gameState) end
+
+    love.graphics.print('press ENTER to start', 200, 200)
+end
+
+function love.load()
+    Gamestate.registerEvents()
+    -- Gamestate.switch(menuState)
+    Gamestate.switch(gameState)
+end
+
+function love.update(dt)
+    Game.Input:update()
 end
