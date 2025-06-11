@@ -2,18 +2,6 @@ local ProjectileSystem = Concord.system({
     pool = { "projectile", "position", "direction", "size", "velocity" },
 })
 
--- function GlompSystem:collide(by, other)
---     if other:has("glompable") then
---         if by:has("projectile") and by.projectile.state == 'moving' then
---             local e = Game.createProjectile(other)
---             e.velocity.x = -by.velocity.x
---             e.direction.last = by.direction.last
-
---             ECS.world:removeEntity(other)
---         end
---     end
--- end
-
 function ProjectileSystem:collide(by, other)
     for _, e in ipairs(self.pool) do
         if by == e and e.projectile.state == 'moving' then
@@ -21,6 +9,9 @@ function ProjectileSystem:collide(by, other)
             local dir = e.direction.last
             local y = e.position.y
             self.doCollide(e)
+
+            -- create a projectile when another projectile hits a glompable object
+            -- TODO: projectile component that just hangs out until told to move?
             if other:has("glompable") then
                 ECS.world:removeEntity(other)
                 local p = Game.createProjectile(other)
