@@ -6,7 +6,7 @@ local tempAccel = 16
 local tempDecel = 16
 
 local tempReverseAccelMod = 2
-local tempAirAccelMod = 0.8
+local tempAirAccelMod = 0.6
 local tempSprintSpeedMod = 1.76
 
 function PlayerSystem.getMaxSpeed(e)
@@ -15,7 +15,6 @@ function PlayerSystem.getMaxSpeed(e)
         speed = e.controller.airSpeed
     end
     if Game.Input:down("sprint") then
-        print("sprinting")
         return speed * tempSprintSpeedMod
     end
     -- TODO: smooth transition between sprinting and not
