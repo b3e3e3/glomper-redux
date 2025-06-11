@@ -17,7 +17,7 @@ function PlayerSystem.getMaxSpeed(e)
     if Game.Input:down("sprint") then
         return speed * tempSprintSpeedMod
     end
-    -- TODO: smooth transition between sprinting and not
+
     return speed
 end
 -- PlayerSystem.getMaxSpeed = Memoize(PlayerSystem.getMaxSpeed)
@@ -47,7 +47,11 @@ function PlayerSystem:update(dt)
             return force * air
         end
 
-        local xforce = math.Clamp(e.velocity.x + getAccel(), -maxSpeed, maxSpeed)
+        local targetxforce = e.velocity.x + getAccel()
+        -- TODO: smooth transition out of sprinting
+        local xforce = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
+
+        print(xforce)
         if Game.Input:down('jump') then
             ECS.world:emit('jump', e)
         end
