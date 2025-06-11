@@ -18,6 +18,7 @@ function PlayerSystem.getMaxSpeed(e)
         return speed * tempSprintSpeedMod
     end
 
+
     return speed
 end
 -- PlayerSystem.getMaxSpeed = Memoize(PlayerSystem.getMaxSpeed)
@@ -50,8 +51,7 @@ function PlayerSystem:update(dt)
         local targetxforce = e.velocity.x + getAccel()
         -- TODO: smooth transition out of sprinting
         local xforce = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
-
-        print(xforce)
+        
         if Game.Input:down('jump') then
             ECS.world:emit('jump', e)
         end
