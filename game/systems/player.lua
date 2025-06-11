@@ -2,7 +2,7 @@ local PlayerSystem = Concord.system({
     pool = { "controller", "position", "velocity", "physics" },
 })
 
-local tempAccel = 8
+local tempAccel = 16
 local tempDecel = 16
 
 local tempReverseAccelMod = 2
