@@ -17,7 +17,7 @@ function ProjectileSystem:collide(by, other)
                 local p = Game.createProjectile(other)
                 p.position.y = y
                 p.velocity.x = -vel
-                e.direction.last = dir
+                e.direction.last = -dir
                 self.doCollide(p)
             end
         end
@@ -46,8 +46,16 @@ function ProjectileSystem:update(dt)
 
     local function spinoutUpdate(e)
         e.testdraw.angle = e.testdraw.angle + 18 * dt
+        
+        local damp = 100
+        local xvel = e.velocity.x - e.direction.last * damp * dt
+        -- print("Spinning out in dir " .. e.direction.last)
+        -- xvel = math.Clamp(xvel, 0, e.velocity.x * e.direction.last)
+        -- if math.abs(xvel) <= 0 then
+        --     xvel = 0
+        -- end
+        e.velocity.x = xvel
 
-        e.velocity.x = e.velocity.x - e.direction.last * 100 * dt
         e.velocity.y = e.velocity.y + 600 * dt
         
         if e.position.y < e.size.h or e.position.y > love.graphics.getHeight() then
