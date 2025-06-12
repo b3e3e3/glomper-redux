@@ -5,7 +5,6 @@ local GlompSystem = Concord.system({
 })
 
 function GlompSystem:hitByProjectile(by, other)
-    print('hit by projectile')
     for _, e in ipairs(self.glompable) do
         if e == other then
             local p = Game.createProjectile(other)

@@ -54,4 +54,8 @@ function Physics.isGrounded(e) -- TODO: better refactor for this
     return #Game.Physics.getCols(e, 0, 1) > 0
 end
 
+function Physics.isOnWall(e) -- TODO: better refactor for this
+    return #Game.Physics.getCols(e, e.direction.last, 0) > 0
+end
+
 return Physics

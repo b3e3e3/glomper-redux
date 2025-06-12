@@ -23,16 +23,6 @@ function PlayerSystem.getMaxSpeed(e)
 end
 -- PlayerSystem.getMaxSpeed = Memoize(PlayerSystem.getMaxSpeed)
 
-function PlayerSystem:jump(e)
-    for _, v in ipairs(self.pool) do
-        if e == v then
-            if Game.Physics.isGrounded(e) then
-                e.velocity.y = -e.controller.jumpForce
-            end
-        end
-    end
-end
-
 function PlayerSystem:update(dt)
     for _, e in ipairs(self.pool) do
         local x = Game.Input:get('move')
@@ -53,7 +43,7 @@ function PlayerSystem:update(dt)
         local xforce = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
         
         if Game.Input:down('jump') then
-            ECS.world:emit('jump', e)
+            ECS.world:emit('jump', e, e.controller.jumpForce)
         end
 
         e.velocity.x = xforce

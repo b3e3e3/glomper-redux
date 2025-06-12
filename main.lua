@@ -92,12 +92,12 @@ function gameState:enter()
             :assemble(ECS.a.staticbody,
             -thickness, 0,
             thickness, love.graphics.getHeight()
-        ),
+        ):give("wall"), -- TODO: assemblage
         Concord.entity(ECS.world)
             :assemble(ECS.a.staticbody,
             love.graphics.getWidth(), 0,
             thickness, love.graphics.getHeight()
-        )
+        ):give("wall"), -- TODO: assemblage
     }
 end
 

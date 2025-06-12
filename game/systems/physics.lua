@@ -29,6 +29,16 @@ function PhysicsSystem:freeze(e)
 
 end
 
+function PhysicsSystem:jump(e, force)
+    for _, v in ipairs(self.physbody) do
+        if e == v then
+            if Game.Physics.isGrounded(e) then
+                e.velocity.y = -force
+            end
+        end
+    end
+end
+
 function PhysicsSystem:update(dt)
     local function applyGravity(e)
         e.velocity:apply(nil, -e.physics.gravity)
