@@ -4,17 +4,23 @@ local GlompSystem = Concord.system({
     glomped = { "glomped", "position", "physics" },
 })
 
--- function GlompSystem:collide(by, other)
---     if other:has("glompable") then
---         if by:has("projectile") and by.projectile.state == 'moving' then
---             local e = Game.createProjectile(other)
---             e.velocity.x = -by.velocity.x
---             e.direction.last = by.direction.last
---             ProjectileSystem
---             ECS.world:removeEntity(other)
---         end
---     end
--- end
+function GlompSystem:hitByProjectile(by, other)
+    print('hit by projectile')
+    for _, e in ipairs(self.glompable) do
+        if e == other then
+            print('found glompable!')
+            local p = Game.createProjectile(other)
+            p.projectile.state = 'collided' -- <-- TODO: hacky
+            p.position.y = by.position.y
+            p.velocity.x = -by.velocity.x
+            p.direction.last = -by.direction.last
+
+            ECS.world:removeEntity(other)
+        end
+    end
+
+    
+end
 
 function GlompSystem:glomp(by, other)
     if other:has("glomped") then return end
@@ -49,22 +55,11 @@ end
 -- 1. create player again
 -- 2. remove glompable entity
 -- 3. create projectile where glompable was (basically)
--- 4. freeze the player for 0.3 seconds and then unfreeze
+-- 4. freeze the player and then unfreeze
 
 -- FUTURE ISSUES :(
 -- * (BIG) what if the player holds important information that can't be recreated after removal?
 -- * what if freezing the physics system isn't deep enough?
-
--- function GlompSystem.createProjectile(e)
---     return Concord.entity(ECS.world)
---     :assemble(ECS.a.projectile,
---         e.position.x + 32,
---         e.position.y,
---         e.size.x, e.size.y,
---         e.direction.last
---     )
---     :give("testdraw")
--- end
 
 function GlompSystem:throw(e)
     local by = Game.createPlayer(e.position.x, e.position.y)
@@ -73,6 +68,7 @@ function GlompSystem:throw(e)
     local projectile = Game.createProjectile(e)
     projectile.projectile.onFinished = function(projectile)
         by.velocity.y = 0
+        by.velocity.x = 0
         by.physics.isFrozen = false
         ECS.world:removeEntity(projectile)
     end

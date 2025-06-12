@@ -34,12 +34,8 @@ function PhysicsSystem:update(dt)
         e.velocity:apply(nil, -e.physics.gravity)
     end
 
-    local function calculateGoalPos(e)
-        return Game.Physics.calculateGoalPos(e.position, e.velocity)
-    end
-
     local function moveAndCollide(e)       
-        local goalX, goalY = calculateGoalPos(e)
+        local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
         local actualX, actualY, cols = Game.Physics.checkCollision(e, goalX, goalY)
 
         if #cols > 0 then
