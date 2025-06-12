@@ -23,20 +23,36 @@ end
 function GlompSystem:glomp(by, other)
     if other:has("glomped") then return end
     other:give("glomped")
+    -- other:ensure("physics")
+    other.physics.isSolid = false
+    by.position.y = other.position.y
+    by.position.x = other.position.x
 
-    if by:has("controller") then
-        local speed = by.controller.speed * 0.5
-        local jumpForce = by.controller.jumpForce * 0.7
+    by.controller.airSpeed = by.controller.speed * 0.5
+    by.controller.speed = 0
+    by.controller.jumpForce = by.controller.jumpForce * 0.7
+    
+    by
+    :give("offset", nil, -other.size.h)
+    :give("glompsprite")
 
-        ECS.world:removeEntity(by)
+    ECS.world:removeEntity(other)
+    
 
-        other:give("controller", 0, jumpForce, speed)
-        other:give("glompsprite", "")
-    end
+    -- if by:has("controller") then
+    --     local speed = by.controller.speed * 0.5
+    --     local jumpForce = by.controller.jumpForce * 0.7
+
+    --     ECS.world:removeEntity(by)
+
+    --     other:give("controller", 0, jumpForce, speed)
+    --     other:give("glompsprite", "")
+    -- end
 end
 
 function GlompSystem:jump(e)
-    if not self.glomped:has(e) then return end
+    -- if not self.glomped:has(e) then return end
+    if not self.glomper:has(e) then return end
     if Game.Physics.isGrounded(e) then return end
     if not Game.Input:pressed("jump") then return end
     if e.physics.isFrozen then return end -- HACK: might be shit
@@ -60,18 +76,26 @@ end
 -- * what if freezing the physics system isn't deep enough?
 
 function GlompSystem:throw(e)
-    local by = Game.createPlayer(e.position.x, e.position.y)
-    ECS.world:removeEntity(e)
+    -- local by = Game.createPlayer(e.position.x, e.position.y)
+    -- ECS.world:removeEntity(e)
+
+    -- e:ensure("offset")
+    -- e.position.y = e.position.y + e.offset.y
+    e
+    :remove("offset")
+    :remove("glompsprite")
 
     local projectile = Game.createProjectile(e)
     projectile.projectile.onFinished = function(projectile)
-        by.velocity.y = 0
-        by.velocity.x = 0
-        by.physics.isFrozen = false
+        e.velocity.y = 0
+        e.velocity.x = 0
+        e.physics.isFrozen = false
+
+        -- TODO: RETURN ORIGINAL MOTION
     end
     
-    by.physics.isFrozen = true
-    by.position.y = e.position.y - 32
+    e.physics.isFrozen = true
+    e.position.y = e.position.y - 32
 end
 
 -- GLOMPABLE
@@ -88,6 +112,7 @@ end
 -- GLOMPER
 function GlompSystem:glomperUpdate(e, dt)
     local function glompFilter(item)
+        if e:has("glomper") and e:has("glompsprite") then return nil end
         if not item:has("glompable") then return nil end
         return 'touch'
     end

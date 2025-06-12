@@ -27,9 +27,9 @@ function TestDrawSystem:hide(e)
 end
 
 function TestDrawSystem:glomp(by, other)
-    print("Glomped")
-    if not by:has("testdraw") then return end
-    by.testdraw.visible = false
+    -- print("Glomped")
+    -- if not by:has("testdraw") then return end
+    -- by.testdraw.visible = false
 end
 
 function TestDrawSystem.drawInfoText(e, lineHeight)
@@ -85,8 +85,11 @@ function TestDrawSystem:drawGraphic()
         love.graphics.rotate(e.testdraw.angle)
         love.graphics.translate(-e.size.w / 2, -e.size.h / 2)
 
+        local offset = e.offset or {x=0, y=0}
+        if offset.y ~= 0 then print(string.format("Drawing with offset %s", offset.y)) end
+
         love.graphics.rectangle("fill",
-            0,0,    
+            0 + offset.x, 0 + offset.y,    
         -- e.position.x, e.position.y,
             e.size.w, e.size.h
         )
@@ -99,11 +102,11 @@ function TestDrawSystem:draw()
     self:drawGraphic()
 
     for _, e in ipairs(self.glompsprite) do
-        love.graphics.setColor(1,1,0)
+        -- love.graphics.setColor(1,1,0)
         love.graphics.rectangle(
             "fill",
             e.position.x,
-            e.position.y - 32,
+            e.position.y,-- - 32,
             32, 32
         )
     end
