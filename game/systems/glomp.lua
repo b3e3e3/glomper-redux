@@ -8,7 +8,6 @@ function GlompSystem:hitByProjectile(by, other)
     print('hit by projectile')
     for _, e in ipairs(self.glompable) do
         if e == other then
-            print('found glompable!')
             local p = Game.createProjectile(other)
             p.projectile.state = 'collided' -- <-- TODO: hacky
             p.position.y = by.position.y
