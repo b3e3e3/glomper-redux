@@ -30,13 +30,21 @@ function ProjectileSystem:update(dt)
     end
 
     local function spinoutUpdate(e)
-        e.testdraw.angle = e.testdraw.angle + 18 * dt
-        
-        local xdamp = 100
-        local ydamp = 600
-        e.velocity.x = e.velocity.x - e.direction.last * xdamp * dt
+        local spin = -e.velocity.x / 6 -- e.direction.last * 20
+        e.testdraw.angle = e.testdraw.angle - spin * dt
 
-        e.velocity.y = e.velocity.y + ydamp * dt
+        local ydamp = 800
+        
+        ---- 1. artificial drag
+        -- local xmult = 0.98
+        -- local xvel = (e.velocity.x * xmult) - e.direction.last * dt
+        
+        ---- 2. stokes drag
+        local xvel = e.velocity.x - 1.5 * e.velocity.x * dt
+        e.velocity.x = xvel
+        
+        local yvel = e.velocity.y + ydamp * dt
+        e.velocity.y = yvel
         
         if e.position.y < e.size.h or e.position.y > love.graphics.getHeight() then
             e.projectile.state = 'finished'
@@ -45,6 +53,8 @@ function ProjectileSystem:update(dt)
 
     local function finishedUpdate(e)
         e.projectile.onFinished(e)
+        ECS.world:removeEntity(e)
+
         e.projectile.state = 'idle'
     end
 

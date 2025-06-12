@@ -70,7 +70,6 @@ function GlompSystem:throw(e)
         by.velocity.y = 0
         by.velocity.x = 0
         by.physics.isFrozen = false
-        ECS.world:removeEntity(projectile)
     end
     
     by.physics.isFrozen = true
