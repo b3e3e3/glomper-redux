@@ -81,7 +81,7 @@ function GlompSystem:throw(e)
 
     e.physics.isFrozen = true
     e.physics.isSolid = false
-    e.position.y = e.position.y - 32
+    e.position.y = e.position.y --- e.size.h
 
     local projectile = Game.createProjectile(e)
     projectile.projectile.onFinished = function(projectile)
