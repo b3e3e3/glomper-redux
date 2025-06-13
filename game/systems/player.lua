@@ -42,11 +42,12 @@ function PlayerSystem:update(dt)
         -- TODO: smooth transition out of sprinting
         local xforce = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
         
-        if Game.Input:down('jump') then
+        if Game.Input:pressed('jump') then
             ECS.world:emit('jump', e, e.controller.stats.jumpForce)
         end
 
-        e.velocity.x = xforce
+        -- e.velocity.x = xforce
+        ECS.world:emit('move', e, xforce)
         if e:has("direction") then
             if x ~= 0 then e.direction.last = x end
         end

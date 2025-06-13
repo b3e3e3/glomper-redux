@@ -55,7 +55,17 @@ function Physics.isGrounded(e) -- TODO: better refactor for this
 end
 
 function Physics.isOnWall(e) -- TODO: better refactor for this
-    return #Game.Physics.getCols(e, e.direction.last, 0) > 0
+    local filter = function(item, other)
+        if other:has("wall") then return 'touch' else return nil end
+    end
+    local cols = #Game.Physics.getCols(e, e.direction.last, 0, filter)
+    cols = cols + #Game.Physics.getCols(e, -e.direction.last, 0, filter)
+
+    return cols > 0
+end
+
+function Physics.canJump(e)
+    return Physics.isGrounded(e) or Physics.isOnWall(e)
 end
 
 return Physics
