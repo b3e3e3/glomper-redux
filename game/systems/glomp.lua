@@ -25,6 +25,9 @@ function GlompSystem:glomp(by, other)
     other:give("glomped")
     -- other:ensure("physics")
     other.physics.isSolid = false
+
+    by.velocity:set(0,0)
+
     by.position.y = other.position.y
     by.position.x = other.position.x
 
