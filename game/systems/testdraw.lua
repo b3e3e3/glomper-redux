@@ -86,7 +86,7 @@ function TestDrawSystem:drawGraphic()
         love.graphics.translate(-e.size.w / 2, -e.size.h / 2)
 
         local offset = e.offset or {x=0, y=0}
-        if offset.y ~= 0 then print(string.format("Drawing with offset %s", offset.y)) end
+        -- if offset.y ~= 0 then print(string.format("Drawing with offset %s", offset.y)) end
 
         love.graphics.rectangle("fill",
             0 + offset.x, 0 + offset.y,    

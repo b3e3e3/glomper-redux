@@ -10,9 +10,9 @@ local tempAirAccelMod = 0.6
 local tempSprintSpeedMod = 1.76
 
 function PlayerSystem.getMaxSpeed(e)
-    local speed = e.controller.speed
+    local speed = e.controller.stats.speed
     if not Game.Physics.isGrounded(e) then
-        speed = e.controller.airSpeed
+        speed = e.controller.stats.airSpeed
     end
     if Game.Input:down("sprint") then
         return speed * tempSprintSpeedMod
@@ -43,7 +43,7 @@ function PlayerSystem:update(dt)
         local xforce = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
         
         if Game.Input:down('jump') then
-            ECS.world:emit('jump', e, e.controller.jumpForce)
+            ECS.world:emit('jump', e, e.controller.stats.jumpForce)
         end
 
         e.velocity.x = xforce

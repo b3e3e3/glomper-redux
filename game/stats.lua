@@ -28,4 +28,19 @@ Stats = {
   end,
 }
 
+--- Resets all offsets to 0
+function Stats:reset()
+  for i, _ in pairs(self.offset) do
+    self.offset[i] = 0
+  end
+end
+
+--- Bakes the offsets into the base values
+function Stats:commit()
+  for i, _ in pairs(self.offset) do
+    self.base[i] = self[i]
+    self.offset[i] = 0
+  end
+end
+
 return Stats

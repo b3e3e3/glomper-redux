@@ -11,7 +11,10 @@ function ProjectileSystem:update(dt)
         e.velocity.x = e.projectile.speed * e.direction.last
 
         local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
-        local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY)
+        local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY, function (item, other)
+            if other:has('controller') then return nil end -- no player!!!
+            return Game.Physics.filters.default(item, other)
+        end)
 
         if e.position.x < -e.size.w or e.position.x > love.graphics.getWidth()
         or #cols > 0 then

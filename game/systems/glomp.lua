@@ -15,9 +15,7 @@ function GlompSystem:hitByProjectile(by, other)
 
             ECS.world:removeEntity(other)
         end
-    end
-
-    
+    end    
 end
 
 function GlompSystem:glomp(by, other)
@@ -31,36 +29,29 @@ function GlompSystem:glomp(by, other)
     by.position.y = other.position.y
     by.position.x = other.position.x
 
-    by.controller.airSpeed = by.controller.speed * 0.5
-    by.controller.speed = 0
-    by.controller.jumpForce = by.controller.jumpForce * 0.7
-    
+    by.controller.stats:commit()
+
+    by.controller.stats.airSpeed = by.controller.stats.speed * 0.5
+    by.controller.stats.speed = 0
+    by.controller.stats.jumpForce = by.controller.stats.jumpForce * 0.7
+
     by
     :give("offset", nil, -other.size.h)
     :give("glompsprite")
 
     ECS.world:removeEntity(other)
-    
-
-    -- if by:has("controller") then
-    --     local speed = by.controller.speed * 0.5
-    --     local jumpForce = by.controller.jumpForce * 0.7
-
-    --     ECS.world:removeEntity(by)
-
-    --     other:give("controller", 0, jumpForce, speed)
-    --     other:give("glompsprite", "")
-    -- end
 end
 
 function GlompSystem:jump(e)
     -- if not self.glomped:has(e) then return end
     if not self.glomper:has(e) then return end
+    if not e:has('glompsprite') then return end
     if Game.Physics.isGrounded(e) then return end
     if not Game.Input:pressed("jump") then return end
     if e.physics.isFrozen then return end -- HACK: might be shit
     
-    ECS.world:emit("throw", e)
+    -- ECS.world:emit("throw", e)
+    self:throw(e)
 end
 
 -- GLOMP:
@@ -88,17 +79,20 @@ function GlompSystem:throw(e)
     :remove("offset")
     :remove("glompsprite")
 
+    e.physics.isFrozen = true
+    e.physics.isSolid = false
+    e.position.y = e.position.y - 32
+
     local projectile = Game.createProjectile(e)
     projectile.projectile.onFinished = function(projectile)
         e.velocity.y = 0
         e.velocity.x = 0
         e.physics.isFrozen = false
+        e.physics.isSolid = true
 
         -- TODO: RETURN ORIGINAL MOTION
+        e.controller.stats:reset()
     end
-    
-    e.physics.isFrozen = true
-    e.position.y = e.position.y - 32
 end
 
 -- GLOMPABLE

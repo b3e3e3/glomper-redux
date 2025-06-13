@@ -1,4 +1,4 @@
-local _ = require 'util'
+Util = require 'util'
 
 Bump = require 'libraries.bump'
 Concord = require 'libraries.concord'
@@ -19,7 +19,7 @@ end
 function Game.createProjectile(e)
     return Concord.entity(ECS.world)
     :assemble(ECS.a.projectile,
-        e.position.x + 32,
+        e.position.x + (e.size.w * e.direction.last),
         e.position.y,
         e.size.x, e.size.y,
         e.direction.last

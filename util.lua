@@ -10,3 +10,8 @@ end
 
 
 function math.Clamp(n, low, high) return math.min(math.max(n, low), high) end
+
+
+
+Util = {}
+return Util

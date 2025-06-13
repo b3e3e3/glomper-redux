@@ -6,5 +6,5 @@ return function(e, x, y)
     :give("glomper")
     :give("testdraw")
     
-    e.controller.jumpForce = 350
+    e.controller.stats.jumpForce = 350
 end
