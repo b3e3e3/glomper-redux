@@ -24,6 +24,7 @@ function ProjectileSystem:update(dt)
     end
 
     local function collidedUpdate(e)
+        print(e.velocity.x)
         e.velocity.x = -e.velocity.x / 4
         e.velocity.y = -500
 
