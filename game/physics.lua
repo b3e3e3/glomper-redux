@@ -58,10 +58,13 @@ function Physics.isOnWall(e) -- TODO: better refactor for this
     local filter = function(item, other)
         if other:has("wall") then return 'touch' else return nil end
     end
-    local cols = #Game.Physics.getCols(e, e.direction.last, 0, filter)
-    cols = cols + #Game.Physics.getCols(e, -e.direction.last, 0, filter)
+    local rcols = #Game.Physics.getCols(e, 1, 0, filter)
+    local lcols = #Game.Physics.getCols(e, -1, 0, filter)
 
-    return cols > 0
+    local side = -1
+    if rcols > lcols then side = 1 end
+
+    return rcols + lcols > 0, side
 end
 
 function Physics.canJump(e)

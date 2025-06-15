@@ -24,6 +24,8 @@ local physics = Concord.component("physics", function(c, isSolid, gravity)
     c.gravity = gravity or -9.8
     c.isSolid = isSolid == nil or isSolid -- defaults to true if isSolid is nil
     c.isFrozen = false
+
+    c.tempxgrav = 0
 end)
 TestDraw.giveInfoText(physics, function(e)
     local texts = {
@@ -60,5 +62,6 @@ TestDraw.giveInfoText(velocity, function(e)
 end)
 
 local direction = Concord.component("direction", function(c, dir)
-    c.last = dir or 1
+    c.current = dir or 1
+    c.last = c.current
 end)

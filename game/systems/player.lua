@@ -30,6 +30,7 @@ function PlayerSystem:update(dt)
         local maxSpeed = self.getMaxSpeed(e)
 
         local getAccel = function()
+            if x == 0 and e.velocity.x == 0 then return 0 end
             local force = tempAccel * x
             if x == 0 then force = -tempDecel * dir
             elseif x ~= dir then force = tempDecel * tempReverseAccelMod * x end
@@ -49,7 +50,10 @@ function PlayerSystem:update(dt)
         -- e.velocity.x = xforce
         ECS.world:emit('move', e, xforce)
         if e:has("direction") then
-            if x ~= 0 then e.direction.last = x end
+            if x ~= 0 then
+                e.direction.last = e.direction.current
+                e.direction.current = x
+            end
         end
     end
 end

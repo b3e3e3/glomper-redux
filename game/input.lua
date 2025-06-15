@@ -9,7 +9,7 @@ local input = baton.new {
         up = {'key:up', 'key:w'},
         down = {'key:down', 'key:s'},
 
-        jump = {'key:space', 'key:w', 'key:up'},
+        jump = {'key:space', 'key:up'},
         sprint = {'key:lshift'},
     },
     pairs = {

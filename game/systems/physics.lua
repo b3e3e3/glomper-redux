@@ -30,6 +30,7 @@ function PhysicsSystem:freeze(e)
 end
 
 function PhysicsSystem:move(e, xforce)
+    -- if math.abs(xforce) <= 0 then return end
     if not Game.Physics.isOnWall(e) then
         e.velocity.x = xforce
     end
@@ -42,9 +43,15 @@ function PhysicsSystem:jump(e, force)
                 -- normal jump
                 e.velocity.y = -force
                 -- wall jump
-                -- TODO: xgrav that brings you back to the wall after jumping
-                if Game.Physics.isOnWall(e) then
-                    e.velocity.x = -force * e.direction.last
+                local isOnWall, side = Game.Physics.isOnWall(e)
+                if isOnWall then
+                    e.velocity.x = -force * side
+                    -- print(math.Sign(e.velocity.x), side)
+                    if e.direction.current ~= side then
+                        e.physics.tempxgrav = 0
+                    else
+                        e.physics.tempxgrav = (-force / 8) * math.Sign(e.velocity.x)
+                    end
                 end
             end
         end
@@ -53,7 +60,8 @@ end
 
 function PhysicsSystem:update(dt)
     local function applyGravity(e)
-        e.velocity:apply(nil, -e.physics.gravity)
+        local x, y = e.physics.tempxgrav, -e.physics.gravity
+        e.velocity:apply(x, y)
     end
 
     local function moveAndCollide(e)       
@@ -74,6 +82,8 @@ function PhysicsSystem:update(dt)
         -- do something similar for the wall
         if Game.Physics.isOnWall(e) then
             if actualX ~= goalX and math.abs(e.velocity.x) > 0 then
+                -- print("just hit waul")
+                -- e.direction.current = math.Sign(e.velocity.x)
                 e.velocity.y = 0
                 e.velocity.x = 0
             end

@@ -8,7 +8,7 @@ function ProjectileSystem:update(dt)
     end
 
     local function movingUpdate(e)
-        e.velocity.x = e.projectile.speed * e.direction.last
+        e.velocity.x = e.projectile.speed * e.direction.current
 
         local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
         local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY, function (item, other)
@@ -24,7 +24,6 @@ function ProjectileSystem:update(dt)
     end
 
     local function collidedUpdate(e)
-        print(e.velocity.x)
         e.velocity.x = -e.velocity.x / 4
         e.velocity.y = -500
 
@@ -34,14 +33,16 @@ function ProjectileSystem:update(dt)
     end
 
     local function spinoutUpdate(e)
-        local spin = -e.velocity.x / 6 -- e.direction.last * 20
+        -- TODO: figure out why velocity is sometimes 0
+        print(e.velocity.x)
+        local spin = -e.velocity.x / 6 -- e.direction.current * 20
         e.testdraw.angle = e.testdraw.angle - spin * dt
 
         local ydamp = 800
         
         ---- 1. artificial drag
         -- local xmult = 0.98
-        -- local xvel = (e.velocity.x * xmult) - e.direction.last * dt
+        -- local xvel = (e.velocity.x * xmult) - e.direction.current * dt
         
         ---- 2. stokes drag
         local xvel = e.velocity.x - 1.5 * e.velocity.x * dt

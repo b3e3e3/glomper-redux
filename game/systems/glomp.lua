@@ -11,7 +11,7 @@ function GlompSystem:hitByProjectile(by, other)
             p.projectile.state = 'collided' -- <-- TODO: hacky
             p.position.y = by.position.y
             p.velocity.x = -by.velocity.x
-            p.direction.last = -by.direction.last
+            p.direction.current = -by.direction.current
 
             ECS.world:removeEntity(other)
         end
