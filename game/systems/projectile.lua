@@ -10,7 +10,7 @@ function ProjectileSystem:update(dt)
     local function movingUpdate(e)
         e.velocity.x = e.projectile.speed * e.direction.current
 
-        local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
+        local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity, dt)
         local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY, function (item, other)
             if other:has('controller') then return nil end -- no player!!!
             return Game.Physics.filters.default(item, other)
@@ -34,15 +34,19 @@ function ProjectileSystem:update(dt)
 
     local function spinoutUpdate(e)
         -- TODO: figure out why velocity is sometimes 0
-        print(e.velocity.x)
-        local spin = -e.velocity.x / 6 -- e.direction.current * 20
+        if e.velocity.x == 0 then
+            warn("Projectile velocity is 0 while hitting a surface!!")
+            warn(string.format('%s', e.velocity.x==true))
+            print('state==' .. e.projectile.state)
+        end
+        local spin = -e.velocity.x / 6 -- e.direction.last * 20
         e.testdraw.angle = e.testdraw.angle - spin * dt
 
         local ydamp = 800
         
         ---- 1. artificial drag
         -- local xmult = 0.98
-        -- local xvel = (e.velocity.x * xmult) - e.direction.current * dt
+        -- local xvel = (e.velocity.x * xmult) - e.direction.last * dt
         
         ---- 2. stokes drag
         local xvel = e.velocity.x - 1.5 * e.velocity.x * dt

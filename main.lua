@@ -19,10 +19,10 @@ end
 function Game.createProjectile(e)
     return Concord.entity(ECS.world)
     :assemble(ECS.a.projectile,
-        e.position.x + (e.size.w * e.direction.current),
+        e.position.x + (e.size.w * e.direction.last),
         e.position.y,
         e.size.x, e.size.y,
-        e.direction.current
+        e.direction.last
     )
     :give("testdraw")
 end

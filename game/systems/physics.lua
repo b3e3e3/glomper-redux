@@ -45,12 +45,13 @@ function PhysicsSystem:jump(e, force)
                 -- wall jump
                 local isOnWall, side = Game.Physics.isOnWall(e)
                 if isOnWall then
+                    e.velocity.y = -force * 0.7
                     e.velocity.x = -force * side
                     -- print(math.Sign(e.velocity.x), side)
                     if e.direction.current ~= side then
                         e.physics.tempxgrav = 0
                     else
-                        e.physics.tempxgrav = (-force / 8) * math.Sign(e.velocity.x)
+                        e.physics.tempxgrav = (-force / 16) * math.Sign(e.velocity.x)
                     end
                 end
             end
@@ -65,7 +66,7 @@ function PhysicsSystem:update(dt)
     end
 
     local function moveAndCollide(e)       
-        local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity)
+        local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity, dt)
         local actualX, actualY, cols = Game.Physics.checkCollision(e, goalX, goalY)
 
         if #cols > 0 then
@@ -83,7 +84,6 @@ function PhysicsSystem:update(dt)
         if Game.Physics.isOnWall(e) then
             if actualX ~= goalX and math.abs(e.velocity.x) > 0 then
                 -- print("just hit waul")
-                -- e.direction.current = math.Sign(e.velocity.x)
                 e.velocity.y = 0
                 e.velocity.x = 0
             end
