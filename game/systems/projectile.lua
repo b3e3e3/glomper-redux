@@ -8,7 +8,9 @@ function ProjectileSystem:update(dt)
     end
 
     local function movingUpdate(e)
-        e.velocity.x = e.projectile.speed * e.direction.current
+        -- TODO: velocity 0 problem happens here i think
+        e.velocity.x = e.projectile.speed * e.direction.last -- e.direction.current
+        -- print(string.format("%s * %s = %s", e.projectile.speed, e.direction.current, e.velocity.x))
 
         local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity, dt)
         local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY, function (item, other)
@@ -34,9 +36,11 @@ function ProjectileSystem:update(dt)
 
     local function spinoutUpdate(e)
         -- TODO: figure out why velocity is sometimes 0
+        -- update: it happens when your velocity UPON GLOMP is 0? very strange
         if e.velocity.x == 0 then
-            warn("Projectile velocity is 0 while hitting a surface!!")
-            warn(string.format('%s', e.velocity.x==true))
+            print("WANR: Projectile velocity is 0 while hitting a surface!!")
+            print(string.format('vel.x = %s', e.velocity.x))
+            print(string.format('last dir, cur dir: %s, %s', e.direction.last, e.direction.current))
             print('state==' .. e.projectile.state)
         end
         local spin = -e.velocity.x / 6 -- e.direction.last * 20
