@@ -2,6 +2,8 @@ local PlayerSystem = Concord.system({
     pool = { "controller", "position", "velocity", "physics" },
 })
 
+local tempCrawlSpeed = 120
+
 local tempAccel = 16
 local tempDecel = 16
 
@@ -25,7 +27,7 @@ end
 
 function PlayerSystem:update(dt)
     for _, e in ipairs(self.pool) do
-        local x = Game.Input:get('move')
+        local x, y = Game.Input:get('move')
         local dir = math.Sign(e.velocity.x)
         local maxSpeed = self.getMaxSpeed(e)
 
@@ -41,19 +43,29 @@ function PlayerSystem:update(dt)
 
         local targetxforce = e.velocity.x + getAccel()
         -- TODO: smooth transition out of sprinting
-        local xforce = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
+        local force = {}
+        force.x = math.Clamp(targetxforce, -maxSpeed, maxSpeed)
         
         if Game.Input:pressed('jump') then
             ECS.world:emit('jump', e, e.controller.stats.jumpForce)
         end
+        if y ~= 0 then
+            -- print(y)
+            force.y = y * tempCrawlSpeed
+            print(force.y)
+        end
 
         -- e.velocity.x = xforce
-        ECS.world:emit('move', e, xforce)
+        ECS.world:emit('move', e, force)
+
         if e:has("direction") then
-            if x ~= 0 then
+            -- 2nd condition ensures that tapping "right" while on a left wall will not cause
+            -- us to jump off the wall next time we jump. only update last direction when we
+            -- are not on the wall
+            if x ~= 0 and not Game.Physics.isOnWall(e) then
                 e.direction.last = e.direction.current
-                e.direction.current = x
             end
+            e.direction.current = x
         end
     end
 end

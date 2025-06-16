@@ -26,13 +26,25 @@ function PhysicsSystem:freeze(e)
     else
         freeze(e)
     end
-
 end
 
-function PhysicsSystem:move(e, xforce)
+function PhysicsSystem:move(e, force)
+    if type(force) == 'number' then
+        force = { x = force, y = nil }
+    end
+
+    -- print(force.x, force.y)
+
     -- if math.abs(xforce) <= 0 then return end
     if not Game.Physics.isOnWall(e) then
-        e.velocity.x = xforce
+        e.velocity.x = force.x
+    else
+        -- TODO: wall crawling makes you go down for some reason????
+        -- force.y = force.y or 0
+        -- -- if the abs velocity is not equal the abs force, we are trying to do another type of movement
+        -- if force.y == 0 or math.abs(e.velocity.y) ~= math.abs(force.y) then
+        -- e.velocity.y = force.y
+        -- end
     end
 end
 
@@ -42,13 +54,19 @@ function PhysicsSystem:jump(e, force)
             if Game.Physics.canJump(e) then
                 -- normal jump
                 e.velocity.y = -force
+
                 -- wall jump
                 local isOnWall, side = Game.Physics.isOnWall(e)
                 if isOnWall then
                     e.velocity.y = -force * 0.7
                     e.velocity.x = -force * side
-                    -- print(math.Sign(e.velocity.x), side)
-                    if e.direction.current ~= side then
+                    if e.direction.last ~= side
+                        or (
+                        -- if we are TRYING to move, and it's not in the direction our last direction
+                        -- recalls, then that means we are trying to move away from the wall
+                            e.direction.current ~= 0
+                            and e.direction.current ~= e.direction.last
+                        ) then
                         e.physics.tempxgrav = 0
                     else
                         e.physics.tempxgrav = (-force / 16) * math.Sign(e.velocity.x)
@@ -65,7 +83,7 @@ function PhysicsSystem:update(dt)
         e.velocity:apply(x, y)
     end
 
-    local function moveAndCollide(e)       
+    local function moveAndCollide(e)
         local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity, dt)
         local actualX, actualY, cols = Game.Physics.checkCollision(e, goalX, goalY)
 
@@ -83,7 +101,6 @@ function PhysicsSystem:update(dt)
         -- do something similar for the wall
         if Game.Physics.isOnWall(e) then
             if actualX ~= goalX and math.abs(e.velocity.x) > 0 then
-                -- print("just hit waul")
                 e.velocity.y = 0
                 e.velocity.x = 0
             end
