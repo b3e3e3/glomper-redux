@@ -38,7 +38,7 @@ end
 
 function Physics.calculateGoalPos(pos, vel, dt)
     dt = dt or love.timer.getDelta()
-    return pos.x + vel.x * dt, pos.y + vel.y * dt
+    return pos.x + (vel.x * dt), pos.y + (vel.y * dt)
 end
 
 function Physics.checkCollision(e, goalX, goalY, filter)
