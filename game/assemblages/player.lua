@@ -5,6 +5,7 @@ return function(e, x, y)
     :give("controller")--, 400)
     :give("glomper")
     :give("testdraw")
-    
+    :give("status")
+
     e.controller.stats.jumpForce = 350
 end

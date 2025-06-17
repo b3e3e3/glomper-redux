@@ -5,11 +5,30 @@ Concord = require 'libraries.concord'
 
 Gamestate = require 'libraries.hump.gamestate'
 
+Quest = require 'game.quest'
+
+ECS = {
+    c = Concord.components,
+    a = {},
+    s = {},
+    world = Concord.world(),
+}
+
 Game = {
     bumpWorld = Bump.newWorld(), --64),
     Input = require 'game.input',
     Physics = require 'game.physics',
+    Quests = {},
 }
+
+function Game.createQuest(name, desc, rewards)
+    local q = Quest:make(name, desc, rewards)
+
+    table.insert(Game.Quests, q)
+    ECS.world:emit("questAdded", q)
+
+    return q
+end
 
 function Game.createPlayer(x, y)
     return Concord.entity(ECS.world)
@@ -27,13 +46,6 @@ function Game.createProjectile(e)
     :give("testdraw")
 end
 
-ECS = {
-    c = Concord.components,
-    a = {},
-    s = {},
-    world = Concord.world(),
-}
-
 Concord.utils.loadNamespace("game/components")
 
 Concord.utils.loadNamespace("game/assemblages", ECS.a)
@@ -44,7 +56,8 @@ ECS.world:addSystems( -- TODO: auomate this? or not?
     ECS.s.physics,
     ECS.s.player,
     ECS.s.testdraw,
-    ECS.s.projectile
+    ECS.s.projectile,
+    ECS.s.hud
 )
 
 function ECS.world:onEntityAdded(e)
@@ -120,6 +133,9 @@ function love.load()
     Gamestate.registerEvents()
     -- Gamestate.switch(menuState)
     Gamestate.switch(gameState)
+
+    -- Game.createQuest("AHHH", "ooo", nil)
+    -- Game.createQuest("EEEE", "ooo", nil)
 end
 
 function love.update(dt)
