@@ -27,6 +27,7 @@ end
 
 function PlayerSystem:update(dt)
     for _, e in ipairs(self.pool) do
+        if e.physics.isFrozen then goto continue end
         local x, y = Game.Input:get('move')
         local dir = math.Sign(e.velocity.x)
         local maxSpeed = self.getMaxSpeed(e)
@@ -67,6 +68,7 @@ function PlayerSystem:update(dt)
             end
             e.direction.current = x
         end
+        ::continue::
     end
 end
 

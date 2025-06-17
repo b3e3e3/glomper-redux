@@ -17,6 +17,7 @@ local function _displayNextQuestText()
     questText = questTextQueue[1]
     table.remove(questTextQueue, 1)
 
+    -- TODO: states
     Timer.after(2, function()
         questText = "Clear!"
 
@@ -32,14 +33,14 @@ end
 
 local function _questTextDraw()
     if questText and questText ~= "" then
-        love.graphics.print(questText, love.graphics.getWidth()/2, love.graphics.getHeight()/2)
+        love.graphics.print(questText, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
     end
 end
 
 function HUDSystem:statusDraw()
     local e = self.pool[1] -- TODO: decide on loop or singleton??
     -- for _, e in ipairs(self.pool) do
-    love.graphics.setColor(1,1,1)
+    love.graphics.setColor(1, 1, 1)
     love.graphics.print('HP: ' .. e.status.hp, 16, 16)
     love.graphics.print('AP: ' .. e.status.ap, 16, 32)
     -- end
@@ -56,10 +57,9 @@ end
 
 function HUDSystem:questAdded(quest)
     table.insert(questTextQueue, quest.name)
-    
+
     if questText then return end
     _displayNextQuestText()
 end
-
 
 return HUDSystem

@@ -154,8 +154,8 @@ function love.load()
     -- Gamestate.switch(menuState)
     Gamestate.switch(gameState)
 
-    -- Game.createQuest("AHHH", "ooo", nil)
-    -- Game.createQuest("EEEE", "ooo", nil)
+    Game.createQuest("AHHH", "ooo", nil)
+    Game.createQuest("EEEE", "ooo", nil)
 end
 
 function love.update(dt)

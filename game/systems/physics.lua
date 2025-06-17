@@ -16,9 +16,11 @@ function PhysicsSystem:onEntityRemoved(e)
 end
 
 function PhysicsSystem:freeze(e, shouldFreeze)
-    if shouldFreeze == nil then shouldFreeze = not e.physics.isFrozen end
-    local function freeze(e)
-        e.physics.isFrozen = shouldFreeze
+    local function freeze(_e)
+        if shouldFreeze == nil then
+            shouldFreeze = not _e.physics.isFrozen
+        end
+        _e.physics.isFrozen = shouldFreeze
     end
     if e == nil then -- if none specified, freeze all
         for _, v in ipairs(self.all) do
