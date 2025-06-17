@@ -37,6 +37,10 @@ local function _questTextDraw()
     end
 end
 
+function HUDSystem:tempSay(message)
+    questText = message -- TODO: temp
+end
+
 function HUDSystem:statusDraw()
     local e = self.pool[1] -- TODO: decide on loop or singleton??
     -- for _, e in ipairs(self.pool) do
@@ -58,8 +62,8 @@ end
 function HUDSystem:questAdded(quest)
     table.insert(questTextQueue, quest.name)
 
-    if questText then return end
-    _displayNextQuestText()
+    -- if questText then return end
+    -- _displayNextQuestText()
 end
 
 return HUDSystem

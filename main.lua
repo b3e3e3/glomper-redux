@@ -2,7 +2,8 @@ Util = require 'util'
 
 Bump = require 'libraries.bump'
 Concord = require 'libraries.concord'
-Gamestate = require 'libraries.hump.gamestate'
+local Gamestate = require 'libraries.hump.gamestate'
+local Timer = require 'libraries.knife.timer'
 
 Quest = require 'game.quest'
 
@@ -20,12 +21,18 @@ Game = {
     Quests = {},
 }
 
+local _player = nil
+
 function Game.getWidth()
     return love.graphics.getWidth()
 end
 
 function Game.getHeight()
     return love.graphics.getHeight()
+end
+
+function Game.getPlayer()
+    return _player
 end
 
 function Game.createQuest(name, desc, rewards)
@@ -38,8 +45,9 @@ function Game.createQuest(name, desc, rewards)
 end
 
 function Game.createPlayer(x, y)
-    return Concord.entity(ECS.world)
+    _player = Concord.entity(ECS.world)
         :assemble(ECS.a.player, x, y)
+    return _player
 end
 
 function Game.createProjectile(e)
@@ -58,12 +66,13 @@ Concord.utils.loadNamespace("game/components")
 Concord.utils.loadNamespace("game/assemblages", ECS.a)
 Concord.utils.loadNamespace("game/systems", ECS.s)
 
-ECS.world:addSystems( -- TODO: auomate this? or not?
-    ECS.s.glomp,
+ECS.world:addSystems(
     ECS.s.physics,
-    ECS.s.player,
     ECS.s.testdraw,
+    ECS.s.player,
+    ECS.s.glomp,
     ECS.s.projectile,
+    ECS.s.interact,
     ECS.s.hud
 )
 
@@ -77,51 +86,6 @@ end
 
 --- GAME STATE
 local gameState = {}
-function gameState:enter()
-    ECS.world:emit("init")
-
-    local playerEntity = Game.createPlayer(nil, Game.getHeight() - 132)
-
-    -- local testObject = Concord.entity(ECS.world)
-    --     :assemble(ECS.a.physicsbody, Game.getWidth() / 4)
-    --     :give("glompable")
-    --     :give("testdraw")
-    for i = 1, 5, 1 do
-        if i ~= 3 then
-            Concord.entity(ECS.world)
-            :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i*64))
-            :give("glompable")
-            :give("testdraw")
-
-            if i == 5 then
-                local e = Concord.entity(ECS.world)
-                :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i*64))
-                :give("glompable")
-                :give("testdraw")
-                e.position.y = e.position.y - 32
-            end
-        end
-    end
-
-    local floor = Concord.entity(ECS.world)
-        :assemble(ECS.a.staticbody, 0, Game.getHeight() - 100, Game.getWidth(), 100)
-        :give("testdraw")
-
-    local thickness = 32
-    local walls = {
-        Concord.entity(ECS.world)
-            :assemble(ECS.a.staticbody,
-            -thickness, 0,
-            thickness, Game.getHeight()
-        ):give("wall"), -- TODO: assemblage
-        Concord.entity(ECS.world)
-            :assemble(ECS.a.staticbody,
-            Game.getWidth(), 0,
-            thickness, Game.getHeight()
-        ):give("wall"), -- TODO: assemblage
-    }
-end
-
 function gameState:update(dt)
     ECS.world:emit("update", dt)
 end
@@ -156,6 +120,59 @@ function menuState:draw()
     love.graphics.print('press ENTER to start', 200, 200)
 end
 
+local function loadObjects()
+    for i = 1, 5, 1 do
+        if i ~= 3 then
+            Concord.entity(ECS.world)
+            :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i*64))
+            :give("glompable")
+            :give("testdraw")
+
+            if i == 5 then
+                local e = Concord.entity(ECS.world)
+                :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i*64))
+                :give("glompable")
+                :give("testdraw")
+                e.position.y = e.position.y - 32
+            end
+        end
+    end
+
+    Concord.entity(ECS.world)
+    :assemble(ECS.a.physicsbody, 32)
+    :give("testdraw")
+    :give("interactable", function(finish)
+        ECS.world:emit("tempSay", "oh hey!")
+        Timer.after(2, function()
+            ECS.world:emit("tempSay")
+            finish()
+        end)
+    end)
+
+    local floor = Concord.entity(ECS.world)
+        :assemble(ECS.a.staticbody, 0, Game.getHeight() - 100, Game.getWidth(), 100)
+        :give("testdraw")
+
+    local thickness = 32
+    local walls = {
+        Concord.entity(ECS.world)
+            :assemble(ECS.a.staticbody,
+            -thickness, 0,
+            thickness, Game.getHeight()
+        ):give("wall"), -- TODO: assemblage
+        Concord.entity(ECS.world)
+            :assemble(ECS.a.staticbody,
+            Game.getWidth(), 0,
+            thickness, Game.getHeight()
+        ):give("wall"), -- TODO: assemblage
+    }
+end
+
+local function loadQuests()
+    Game.createQuest("AHHH", "ooo", nil)
+    Game.createQuest("EEEE", "ooo", nil)
+end
+
 function love.load()
     Gamestate.registerEvents({
         'init',
@@ -172,11 +189,16 @@ function love.load()
         'joystickreleased',
         'quit',
     })
+
+    ECS.world:emit("init")
+
+    local playerEntity = Game.createPlayer(nil, Game.getHeight() - 132)
+
+    loadObjects()
+    loadQuests()
+
     -- Gamestate.switch(menuState)
     Gamestate.switch(gameState)
-
-    -- Game.createQuest("AHHH", "ooo", nil)
-    -- Game.createQuest("EEEE", "ooo", nil)
 end
 
 function love.update(dt)
