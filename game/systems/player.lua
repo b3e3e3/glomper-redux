@@ -31,6 +31,7 @@ end
 
 function PlayerSystem:interactStart(with, other)
     Game.setFreeze(true, other)
+    other.velocity:set(0,0) -- TODO: "stop" function
 end
 
 function PlayerSystem:interactFinish(with, other)

@@ -2,7 +2,7 @@ local InteractSystem = Concord.system({
     inWorld = { "interactable", "position" }
 })
 
-local DIST = 8
+local DIST = 48
 
 function InteractSystem:start(with, other)
     ECS.world:emit("interactStart", with, other)
@@ -13,13 +13,14 @@ function InteractSystem:finish(with, other)
 end
 
 function InteractSystem:interactFinish(with, other)
-    ECS.world:removeEntity(with)
+    -- ECS.world:removeEntity(with)
 end
 
 local function canInteract(with, other)
     -- TODO: decouple from specific player maybe
     other = other or Game.getPlayer()
-    local inRange = math.abs(with.position.x) - math.abs(other.position.x) < DIST
+    
+    local inRange = math.abs(with.position.x - other.position.x) < DIST
     local grounded = Game.Physics.isGrounded(other)
 
     return inRange and grounded
@@ -32,7 +33,7 @@ function InteractSystem:update(dt)
         if canInteract(e, other) then
             if Game.Input:pressed("interact") then
                 self:start(e, other)
-                e.interactable.onInteract(function()
+                e.interactable.onInteract(e, function()
                     self:finish(e, other)
                 end)
             end

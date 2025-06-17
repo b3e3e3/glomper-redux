@@ -6,6 +6,8 @@ local HUDSystem = Concord.system({
     }
 })
 
+local sayText = {}
+
 local questText = nil
 local questTextQueue = {}
 
@@ -37,8 +39,25 @@ local function _questTextDraw()
     end
 end
 
-function HUDSystem:tempSay(message)
-    questText = message -- TODO: temp
+local function _tempSayDraw()
+    if sayText.message and sayText.message ~= "" then
+        love.graphics.print(sayText.message, sayText.x, sayText.y)
+    end
+end
+
+function HUDSystem:tempSay(message, x, y)
+    if not message or message == "" then
+        sayText = {
+            message = "",
+            x = 0,
+            y = 0,
+        }
+        return
+    end
+    -- TODO: temp
+    sayText.message = message
+    sayText.x = x + 32
+    sayText.y = y - 32
 end
 
 function HUDSystem:statusDraw()
@@ -57,6 +76,7 @@ end
 function HUDSystem:draw()
     self:statusDraw()
     _questTextDraw()
+    _tempSayDraw()
 end
 
 function HUDSystem:questAdded(quest)

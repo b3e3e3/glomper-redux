@@ -7,5 +7,5 @@ return function(e, x, y)
     :give("testdraw")
     :give("status")
 
-    e.controller.stats.jumpForce = 350
+    -- e.controller.stats.jumpForce = 350
 end
