@@ -15,9 +15,10 @@ function PhysicsSystem:onEntityRemoved(e)
     Game.bumpWorld:remove(e)
 end
 
-function PhysicsSystem:freeze(e)
+function PhysicsSystem:freeze(e, shouldFreeze)
+    if shouldFreeze == nil then shouldFreeze = not e.physics.isFrozen end
     local function freeze(e)
-        e.physics.isFrozen = not e.physics.isFrozen
+        e.physics.isFrozen = shouldFreeze
     end
     if e == nil then -- if none specified, freeze all
         for _, v in ipairs(self.all) do

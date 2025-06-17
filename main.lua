@@ -68,6 +68,7 @@ function ECS.world:onEntityRemoved(e)
     ECS.world:emit("onEntityRemoved", e)
 end
 
+--- GAME STATE
 local gameState = {}
 function gameState:enter()
     ECS.world:emit("init")
@@ -122,6 +123,25 @@ function gameState:draw()
     ECS.world:emit("draw")
 end
 
+--- TEXT STATE
+local textState = {}
+function textState:enter()
+    ECS.world:emit("freeze", true)
+end
+
+function textState:update(dt)
+    ECS.world:emit("update", dt)
+end
+
+function textState:draw()
+    ECS.world:emit("draw")
+end
+
+function textState:exit()
+    ECS.world:emit("freeze", false)
+end
+
+--- MENU STATE
 local menuState = {}
 function menuState:draw()
     if Game.Input:pressed('confirm') then Gamestate.switch(gameState) end

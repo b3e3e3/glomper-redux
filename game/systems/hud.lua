@@ -9,24 +9,7 @@ local HUDSystem = Concord.system({
 local questText = nil
 local questTextQueue = {}
 
-function HUDSystem:update(dt)
-    Timer.update(dt)
-end
-
-function HUDSystem:draw()
-    local e = self.pool[1] -- TODO: loop or singleton??
-    -- for _, e in ipairs(self.pool) do
-    love.graphics.setColor(1,1,1)
-    love.graphics.print('HP: ' .. e.status.hp, 16, 16)
-    love.graphics.print('AP: ' .. e.status.ap, 16, 32)
-    -- end
-
-    if questText and questText ~= "" then
-        love.graphics.print(questText, love.graphics.getWidth()/2, love.graphics.getHeight()/2)
-    end
-end
-
-local function displayNextQuestText()
+local function _displayNextQuestText()
     if #questTextQueue == 0 then return end
 
     ECS.world:emit("freeze")
@@ -41,17 +24,42 @@ local function displayNextQuestText()
             questText = nil
             ECS.world:emit("freeze")
             Timer.after(1, function()
-                displayNextQuestText()
+                _displayNextQuestText()
             end)
         end)
     end)
+end
+
+local function _questTextDraw()
+    if questText and questText ~= "" then
+        love.graphics.print(questText, love.graphics.getWidth()/2, love.graphics.getHeight()/2)
+    end
+end
+
+function HUDSystem:statusDraw()
+    local e = self.pool[1] -- TODO: decide on loop or singleton??
+    -- for _, e in ipairs(self.pool) do
+    love.graphics.setColor(1,1,1)
+    love.graphics.print('HP: ' .. e.status.hp, 16, 16)
+    love.graphics.print('AP: ' .. e.status.ap, 16, 32)
+    -- end
+end
+
+function HUDSystem:update(dt)
+    Timer.update(dt)
+end
+
+function HUDSystem:draw()
+    self:statusDraw()
+    _questTextDraw()
 end
 
 function HUDSystem:questAdded(quest)
     table.insert(questTextQueue, quest.name)
     
     if questText then return end
-    displayNextQuestText()
+    _displayNextQuestText()
 end
+
 
 return HUDSystem

@@ -43,14 +43,20 @@ function ProjectileSystem:update(dt)
             print(string.format('last dir, cur dir: %s, %s', e.direction.last, e.direction.current))
             print('state==' .. e.projectile.state)
         end
-        local spin = -e.velocity.x / 6 -- e.direction.last * 20
+
+        local function smoothSpin()
+            return -e.velocity.x / 6
+        end
+        local spin = smoothSpin()
+
+        -- local function vintageSpin()
+        --     return e.direction.last * 20
+        -- end
+        -- local spin = vintageSpin()
+
         e.testdraw.angle = e.testdraw.angle - spin * dt
 
         local ydamp = 800
-        
-        ---- 1. artificial drag
-        -- local xmult = 0.98
-        -- local xvel = (e.velocity.x * xmult) - e.direction.last * dt
         
         ---- 2. stokes drag
         local xvel = e.velocity.x - 1.5 * e.velocity.x * dt
