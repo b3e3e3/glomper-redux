@@ -18,7 +18,7 @@ function ProjectileSystem:update(dt)
             return Game.Physics.filters.default(item, other)
         end)
 
-        if e.position.x < -e.size.w or e.position.x > love.graphics.getWidth()
+        if e.position.x < -e.size.w or e.position.x > Game.getWidth()
         or #cols > 0 then
             for _,c in pairs(cols) do ECS.world:emit("hitByProjectile", e, c.other) end
             e.projectile.state = 'collided'-- self.doCollide(e)
@@ -65,7 +65,7 @@ function ProjectileSystem:update(dt)
         local yvel = e.velocity.y + ydamp * dt
         e.velocity.y = yvel
         
-        if e.position.y < e.size.h or e.position.y > love.graphics.getHeight() then
+        if e.position.y < e.size.h or e.position.y > Game.getHeight() then
             e.projectile.state = 'finished'
         end
     end

@@ -14,9 +14,9 @@ Physics.filters.default = Physics.filters.solid
 function Physics.isOnScreen(pos, size, margin)
     margin = margin or 5
     if pos.x + size.w < 0 + margin then return false
-    elseif pos.x > love.graphics.getWidth() - margin then return false
+    elseif pos.x > Game.getWidth() - margin then return false
     elseif pos.y + size.h < 0 + margin  then return false
-    elseif pos.y > love.graphics.getHeight() - margin then return false end
+    elseif pos.y > Game.getHeight() - margin then return false end
     return true
 end
 

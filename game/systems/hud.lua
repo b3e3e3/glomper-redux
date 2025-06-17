@@ -33,7 +33,7 @@ end
 
 local function _questTextDraw()
     if questText and questText ~= "" then
-        love.graphics.print(questText, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
+        love.graphics.print(questText, Game.getWidth() / 2, Game.getHeight() / 2)
     end
 end
 
