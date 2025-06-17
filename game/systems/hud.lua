@@ -12,7 +12,7 @@ local questTextQueue = {}
 local function _displayNextQuestText()
     if #questTextQueue == 0 then return end
 
-    ECS.world:emit("freeze")
+    Game.setFreeze(true)
 
     questText = questTextQueue[1]
     table.remove(questTextQueue, 1)
@@ -23,7 +23,7 @@ local function _displayNextQuestText()
 
         Timer.after(0.6, function()
             questText = nil
-            ECS.world:emit("freeze")
+            Game.setFreeze(false)
             Timer.after(1, function()
                 _displayNextQuestText()
             end)

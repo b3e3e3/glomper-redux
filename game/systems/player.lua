@@ -25,12 +25,12 @@ function PlayerSystem.getMaxSpeed(e)
 end
 -- PlayerSystem.getMaxSpeed = Memoize(PlayerSystem.getMaxSpeed)
 
-function PlayerSystem:interactStart(e)
-    Game.setFreeze(true, e)
+function PlayerSystem:interactStart(with, other)
+    Game.setFreeze(true, other)
 end
 
-function PlayerSystem:interactFinish(e)
-    Game.setFreeze(false, e)
+function PlayerSystem:interactFinish(with, other)
+    Game.setFreeze(false, other)
 end
 
 function PlayerSystem:update(dt)
