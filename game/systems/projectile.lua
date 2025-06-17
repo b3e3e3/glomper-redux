@@ -9,13 +9,15 @@ function ProjectileSystem:update(dt)
 
     local function movingUpdate(e)
         -- TODO: velocity 0 problem happens here i think
+        -- POTENTIALLY fixed by game/physics.lua:15 by making the collider "cross"
+        -- instead of slide or touch, which might make the velocity 0
         e.velocity.x = e.projectile.speed * e.direction.last -- e.direction.current
         -- print(string.format("%s * %s = %s", e.projectile.speed, e.direction.current, e.velocity.x))
 
         local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity, dt)
         local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY, function (item, other)
             if other:has('controller') then return nil end -- no player!!!
-            return Game.Physics.filters.default(item, other)
+            return Game.Physics.filters.cross(item, other)--default(item, other)
         end)
 
         if e.position.x < -e.size.w or e.position.x > Game.getWidth()

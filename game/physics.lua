@@ -1,22 +1,32 @@
 local Physics = {}
 
-Physics.filters = {
-    solid = function(item, other)
+local function _makeGenericFilter(method)
+    return function(item, other)
         if not item:has("physics") or not other:has("physics") then return nil end
         if not item.physics.isSolid or not other.physics.isSolid then
             return 'cross'
         end
-        return 'slide'
-    end,
+        return method
+    end
+end
+
+Physics.filters = {
+    solid = _makeGenericFilter('slide'),
+    cross = _makeGenericFilter('cross'),
 }
 Physics.filters.default = Physics.filters.solid
 
 function Physics.isOnScreen(pos, size, margin)
     margin = margin or 5
-    if pos.x + size.w < 0 + margin then return false
-    elseif pos.x > Game.getWidth() - margin then return false
-    elseif pos.y + size.h < 0 + margin  then return false
-    elseif pos.y > Game.getHeight() - margin then return false end
+    if pos.x + size.w < 0 + margin then
+        return false
+    elseif pos.x > Game.getWidth() - margin then
+        return false
+    elseif pos.y + size.h < 0 + margin then
+        return false
+    elseif pos.y > Game.getHeight() - margin then
+        return false
+    end
     return true
 end
 
@@ -27,7 +37,7 @@ function Physics.newHitbox(w, h, xoffset, yoffset)
         xoffset = xoffset,
         yoffset = yoffset,
 
-        
+
     }
     function hitbox:getOffsetPos(baseX, baseY)
         return baseX + self.xoffset, baseY + self.yoffset
@@ -46,7 +56,8 @@ function Physics.checkCollision(e, goalX, goalY, filter)
 end
 
 function Physics.getCols(e, xOffset, yOffset, filter)
-    local _, _, cols = Physics.checkCollision(e, e.position.x + (xOffset or 0), e.position.y + (yOffset or 0), filter or Physics.filters.default)
+    local _, _, cols = Physics.checkCollision(e, e.position.x + (xOffset or 0), e.position.y + (yOffset or 0),
+        filter or Physics.filters.default)
     return cols
 end
 
