@@ -155,11 +155,7 @@ local function loadObjects()
         :give("testdraw")
         :give("interactable", function(e, finish)
             -- ECS.world:emit("say", {
-            --     CreateDialogMessage("oh heyyy"),
-            --     CreateDialogMessage("wtf is up"),
-            -- }, e, finish)
-            
-            e:ensure('dialog', {
+            e:give('dialog', {
                 CreateDialogMessage("oh heyyy"),
                 CreateDialogMessage("wtf is up"),
             }, finish)
