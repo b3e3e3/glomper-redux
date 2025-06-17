@@ -4,6 +4,10 @@ local InteractSystem = Concord.system({
 
 local DIST = 8
 
+function InteractSystem:start(with, other)
+    ECS.world:emit("interactStart", with, other)
+end
+
 function InteractSystem:finish(with, other)
     ECS.world:emit("interactFinish", with, other)
 end
@@ -27,7 +31,7 @@ function InteractSystem:update(dt)
     for _, e in ipairs(self.inWorld) do
         if canInteract(e, other) then
             if Game.Input:pressed("interact") then
-                ECS.world:emit("interactStart", e, other)
+                self:start(e, other)
                 e.interactable.onInteract(function()
                     self:finish(e, other)
                 end)
