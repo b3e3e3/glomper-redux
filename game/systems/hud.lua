@@ -3,10 +3,11 @@ local Timer = require 'libraries.knife.timer'
 local HUDSystem = Concord.system({
     pool = {
         'status'
+    },
+    dialog = {
+        'dialog', 'position'
     }
 })
-
-local sayText = {}
 
 local questText = nil
 local questTextQueue = {}
@@ -39,25 +40,42 @@ local function _questTextDraw()
     end
 end
 
-local function _tempSayDraw()
-    if sayText.message and sayText.message ~= "" then
-        love.graphics.print(sayText.message, sayText.x, sayText.y)
+function HUDSystem:dialogDraw()
+    for _, e in ipairs(self.dialog) do
+        -- if #e.dialog.all == 0 then goto continue end
+
+        love.graphics.push()
+
+        -- temp
+        love.graphics.setColor(1, 1, 0)
+        love.graphics.circle("fill", e.position.x, e.position.y, 15)
+
+        local boxMargin = 4
+        local boxHeight = 128
+
+        love.graphics.setColor(255/235, 255/230, 255/176)
+        love.graphics.rectangle(
+            "fill",
+            boxMargin,
+            Game.getHeight() - boxMargin - boxHeight,
+
+            Game.getWidth() - boxMargin - boxMargin,
+            boxHeight
+        )
+
+        love.graphics.pop()
+
+        ::continue::
     end
 end
 
-function HUDSystem:tempSay(message, x, y)
-    if not message or message == "" then
-        sayText = {
-            message = "",
-            x = 0,
-            y = 0,
-        }
-        return
-    end
-    -- TODO: temp
-    sayText.message = message
-    sayText.x = x + 32
-    sayText.y = y - 32
+function HUDSystem:say(message, e)
+    e:give('dialog')
+    -- local x, y = e.position.x, e.position.y
+    -- if not message or message == "" then
+    --     -- TODO: unsay
+    --     return
+    -- end
 end
 
 function HUDSystem:statusDraw()
@@ -75,8 +93,8 @@ end
 
 function HUDSystem:draw()
     self:statusDraw()
+    self:dialogDraw()
     _questTextDraw()
-    _tempSayDraw()
 end
 
 function HUDSystem:questAdded(quest)
