@@ -122,6 +122,7 @@ function HUDSystem:update(dt)
         local nextDialog = nil
         if Game.Input:pressed("interact") then
             nextDialog = e.dialog.next()
+            print("Next dialog? " .. tostring(nextDialog==nil))
             if nextDialog ~= nil then
                 e.dialog.finished = false
             else
