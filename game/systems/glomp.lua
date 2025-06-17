@@ -15,7 +15,7 @@ function GlompSystem:hitByProjectile(by, other)
 
             ECS.world:removeEntity(other)
         end
-    end    
+    end
 end
 
 function GlompSystem:glomp(by, other)
@@ -24,7 +24,7 @@ function GlompSystem:glomp(by, other)
     -- other:ensure("physics")
     other.physics.isSolid = false
 
-    by.velocity:set(0,0)
+    by.velocity:set(0, 0)
 
     by.position.y = other.position.y
     by.position.x = other.position.x
@@ -36,8 +36,8 @@ function GlompSystem:glomp(by, other)
     by.controller.stats.jumpForce = by.controller.stats.jumpForce * 0.7
 
     by
-    :give("offset", nil, -other.size.h)
-    :give("glompsprite")
+        :give("offset", nil, -other.size.h)
+        :give("glompsprite")
 
     ECS.world:removeEntity(other)
 end
@@ -49,7 +49,7 @@ function GlompSystem:jump(e)
     if Game.Physics.isGrounded(e) then return end
     if not Game.Input:pressed("jump") then return end
     if e.physics.isFrozen then return end -- HACK: might be shit
-    
+
     -- ECS.world:emit("throw", e)
     self:throw(e)
 end
@@ -76,10 +76,10 @@ function GlompSystem:throw(e)
     -- e:ensure("offset")
     -- e.position.y = e.position.y + e.offset.y
     e
-    :remove("offset")
-    :remove("glompsprite")
+        :remove("offset")
+        :remove("glompsprite")
 
-    e.physics.isFrozen = true
+    Game.setFreeze(true, e)     -- e.physics.isFrozen = true
     e.physics.isSolid = false
     e.position.y = e.position.y --- e.size.h
 
@@ -87,7 +87,7 @@ function GlompSystem:throw(e)
     projectile.projectile.onFinished = function(projectile)
         e.velocity.y = 0
         e.velocity.x = 0
-        e.physics.isFrozen = false
+        Game.setFreeze(false, e) -- e.physics.isFrozen = false
         e.physics.isSolid = true
 
         -- TODO: RETURN ORIGINAL MOTION

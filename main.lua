@@ -7,6 +7,8 @@ local Timer = require 'libraries.knife.timer'
 
 Quest = require 'game.quest'
 
+local _player = nil
+
 ECS = {
     c = Concord.components,
     a = {},
@@ -19,9 +21,19 @@ Game = {
     Input = require 'game.input',
     Physics = require 'game.physics',
     Quests = {},
+    
+    _frozen = false,
 }
 
-local _player = nil
+function Game.setFreeze(shouldFreeze, entity)
+    entity = entity or nil
+    if shouldFreeze == nil then
+        shouldFreeze = not Game._frozen
+    end
+
+    Game._frozen = shouldFreeze
+    ECS.world:emit("freeze", shouldFreeze, entity)
+end
 
 function Game.getWidth()
     return love.graphics.getWidth()
@@ -97,7 +109,7 @@ end
 --- TEXT STATE
 local textState = {}
 function textState:enter()
-    ECS.world:emit("freeze", true)
+    Game.setFreeze(true)-- ECS.world:emit("freeze", true)
 end
 
 function textState:update(dt)
@@ -109,7 +121,7 @@ function textState:draw()
 end
 
 function textState:exit()
-    ECS.world:emit("freeze", false)
+    Game.setFreeze(false)-- ECS.world:emit("freeze", false)
 end
 
 --- MENU STATE

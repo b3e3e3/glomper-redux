@@ -15,7 +15,9 @@ function PhysicsSystem:onEntityRemoved(e)
     Game.bumpWorld:remove(e)
 end
 
-function PhysicsSystem:freeze(e, shouldFreeze)
+function PhysicsSystem:freeze(shouldFreeze, e)
+    local w = "Freezing"
+    if shouldFreeze == false then w = "Unfreezing" end
     local function freeze(_e)
         if shouldFreeze == nil then
             shouldFreeze = not _e.physics.isFrozen
@@ -23,10 +25,12 @@ function PhysicsSystem:freeze(e, shouldFreeze)
         _e.physics.isFrozen = shouldFreeze
     end
     if e == nil then -- if none specified, freeze all
+        print(string.format("%s all entities.", w))
         for _, v in ipairs(self.all) do
             freeze(v)
         end
     else
+        print(string.format("%s single entity. Player? %s", w, e:has("controller")))
         freeze(e)
     end
 end

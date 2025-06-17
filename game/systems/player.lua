@@ -25,6 +25,14 @@ function PlayerSystem.getMaxSpeed(e)
 end
 -- PlayerSystem.getMaxSpeed = Memoize(PlayerSystem.getMaxSpeed)
 
+function PlayerSystem:interactStart(e)
+    Game.setFreeze(true, e)
+end
+
+function PlayerSystem:interactFinish(e)
+    Game.setFreeze(false, e)
+end
+
 function PlayerSystem:update(dt)
     for _, e in ipairs(self.pool) do
         if e.physics.isFrozen then goto continue end
