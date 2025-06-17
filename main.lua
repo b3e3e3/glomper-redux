@@ -21,7 +21,7 @@ Game = {
     Input = require 'game.input',
     Physics = require 'game.physics',
     Quests = {},
-    
+
     _frozen = false,
 }
 
@@ -64,13 +64,13 @@ end
 
 function Game.createProjectile(e)
     return Concord.entity(ECS.world)
-    :assemble(ECS.a.projectile,
-        e.position.x + (e.size.w * e.direction.last),
-        e.position.y,
-        e.size.x, e.size.y,
-        e.direction.last
-    )
-    :give("testdraw")
+        :assemble(ECS.a.projectile,
+            e.position.x + (e.size.w * e.direction.last),
+            e.position.y,
+            e.size.x, e.size.y,
+            e.direction.last
+        )
+        :give("testdraw")
 end
 
 Concord.utils.loadNamespace("game/components")
@@ -109,7 +109,7 @@ end
 --- TEXT STATE
 local textState = {}
 function textState:enter()
-    Game.setFreeze(true)-- ECS.world:emit("freeze", true)
+    Game.setFreeze(true) -- ECS.world:emit("freeze", true)
 end
 
 function textState:update(dt)
@@ -121,7 +121,7 @@ function textState:draw()
 end
 
 function textState:exit()
-    Game.setFreeze(false)-- ECS.world:emit("freeze", false)
+    Game.setFreeze(false) -- ECS.world:emit("freeze", false)
 end
 
 --- MENU STATE
@@ -136,30 +136,34 @@ local function loadObjects()
     for i = 1, 5, 1 do
         if i ~= 3 then
             Concord.entity(ECS.world)
-            :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i*64))
-            :give("glompable")
-            :give("testdraw")
+                :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i * 64))
+                :give("glompable")
+                :give("testdraw")
 
             if i == 5 then
                 local e = Concord.entity(ECS.world)
-                :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i*64))
-                :give("glompable")
-                :give("testdraw")
+                    :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + (i * 64))
+                    :give("glompable")
+                    :give("testdraw")
                 e.position.y = e.position.y - 32
             end
         end
     end
 
     Concord.entity(ECS.world)
-    :assemble(ECS.a.physicsbody, 32)
-    :give("testdraw")
-    :give("interactable", function(e, finish)
-        ECS.world:emit("say", "oh hey!", e)
-        Timer.after(2, function()
-            ECS.world:emit("say")
-            finish()
+        :assemble(ECS.a.physicsbody, 32)
+        :give("testdraw")
+        :give("interactable", function(e, finish)
+            -- ECS.world:emit("say", {
+            --     CreateDialogMessage("oh heyyy"),
+            --     CreateDialogMessage("wtf is up"),
+            -- }, e, finish)
+            
+            e:ensure('dialog', {
+                CreateDialogMessage("oh heyyy"),
+                CreateDialogMessage("wtf is up"),
+            }, finish)
         end)
-    end)
 
     local floor = Concord.entity(ECS.world)
         :assemble(ECS.a.staticbody, 0, Game.getHeight() - 100, Game.getWidth(), 100)
@@ -169,14 +173,14 @@ local function loadObjects()
     local walls = {
         Concord.entity(ECS.world)
             :assemble(ECS.a.staticbody,
-            -thickness, 0,
-            thickness, Game.getHeight()
-        ):give("wall"), -- TODO: assemblage
+                -thickness, 0,
+                thickness, Game.getHeight()
+            ):give("wall"), -- TODO: assemblage
         Concord.entity(ECS.world)
             :assemble(ECS.a.staticbody,
-            Game.getWidth(), 0,
-            thickness, Game.getHeight()
-        ):give("wall"), -- TODO: assemblage
+                Game.getWidth(), 0,
+                thickness, Game.getHeight()
+            ):give("wall"), -- TODO: assemblage
     }
 end
 

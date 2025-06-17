@@ -5,15 +5,22 @@ local InteractSystem = Concord.system({
 local DIST = 48
 
 function InteractSystem:start(with, other)
+    if with.interactable.interacting then return end
     ECS.world:emit("interactStart", with, other)
 end
 
 function InteractSystem:finish(with, other)
-    ECS.world:emit("interactFinish", with, other)
+    if not with.interactable.interacting then return end
+    ECS.world:emit("interactFinish", with)--, other)
+end
+
+function InteractSystem:interactStart(with, other)
+    with.interactable.interacting = true
 end
 
 function InteractSystem:interactFinish(with, other)
     -- ECS.world:removeEntity(with)
+    with.interactable.interacting = false
 end
 
 local function canInteract(with, other)
