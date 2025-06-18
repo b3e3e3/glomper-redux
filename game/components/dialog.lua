@@ -9,20 +9,29 @@ function CreateDialogMessage(text, portrait, type)
 end
 
 local dialog = Concord.component("dialog", function(c, messages, onFinished)
-    c._index = 0
+    c._idx = 0
     c.finished = false
 
     c.queue = messages or {}
     c.onFinished = onFinished or function() end
 
+    c.get = function(index)
+        if index > #c.queue then return nil end
+        if index <= 0 then return nil end
+        return c.queue[index]
+    end
+
     c.current = function()
-        if c._index > #c.queue then return nil end
-        if c._index <= 0 then return nil end
-        return c.queue[c._index]
+        return c.get(c._idx)
     end
 
     c.next = function() -- TODO: system
-        c._index = c._index + 1
+        return c.get(c._idx + 1)
+    end
+
+    c.advance = function()
+        print("Advancing!", c._idx, '->', c._idx + 1)
+        c._idx = c._idx + 1
         return c.current()
     end
 end)

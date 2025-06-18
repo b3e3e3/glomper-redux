@@ -112,20 +112,21 @@ function HUDSystem:dialogFinish(e)
     e.dialog.finished = true
 
     e.dialog.onFinished()
-    e.dialog._index = 0
+    e.dialog._idx = 0
 end
 
 function HUDSystem:update(dt)
     Timer.update(dt)
 
     for _, e in ipairs(self.dialog) do
-        local nextDialog = nil
+        local nextDialog = e.dialog.next()
+        -- print(e.dialog.finished, nextDialog, #e.dialog.queue, e.dialog._index)
         if Game.Input:pressed("interact") then
-            nextDialog = e.dialog.next()
-            print("Next dialog? " .. tostring(nextDialog==nil))
             if nextDialog ~= nil then
                 e.dialog.finished = false
+                e.dialog.advance()
             else
+                print("We done now")
                 self:dialogFinish(e)
                 goto continue
             end
