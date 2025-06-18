@@ -23,7 +23,10 @@ Game = {
     Quests = {},
 
     Fonts = {
-        header = love.graphics.newFont('assets/font/Whacky_Joe_Monospaced.ttf', 24)
+        header = love.graphics.newFont(
+        'assets/font/Whacky_Joe_Monospaced_BM.fnt',
+        'assets/font/Whacky_Joe_Monospaced_BM_0.png'
+    )
     },
 
     _frozen = false,
