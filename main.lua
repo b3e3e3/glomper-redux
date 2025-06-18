@@ -95,7 +95,8 @@ ECS.world:addSystems(
     ECS.s.glomp,
     ECS.s.projectile,
     ECS.s.interact,
-    ECS.s.hud
+    ECS.s.hud,
+    ECS.s.dialog
 )
 
 function ECS.world:onEntityAdded(e)
