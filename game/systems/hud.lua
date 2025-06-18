@@ -1,4 +1,5 @@
 local Timer = require 'libraries.knife.timer'
+local slicy = require 'libraries.slicy'
 
 -- TODO: decouple dialog system
 local HUDSystem = Concord.system({
@@ -10,8 +11,10 @@ local HUDSystem = Concord.system({
     }
 })
 
-local questText = nil
+local questText
 local questTextQueue = {}
+
+local pane
 
 local function _displayNextQuestText()
     if #questTextQueue == 0 then return end
@@ -37,14 +40,18 @@ local function _questTextDraw()
     end
 end
 
+function HUDSystem:init()
+    pane = slicy.load("box.9.png")
+end
+
 function HUDSystem:dialogDraw()
     for _, e in ipairs(self.dialog) do
         if not e.dialog.current() then goto continue end
 
         love.graphics.push()
 
-        local pointMargin = 24
-        local pointWidth = 8
+        -- local pointMargin = 24
+        -- local pointWidth = 8
         local boxMargin = 32
         local boxHeight = 128
         local textMargin = 8
@@ -55,27 +62,41 @@ function HUDSystem:dialogDraw()
         local baseX, baseY = 0, e.position.y
 
         love.graphics.setColor(r, g, b)
-        love.graphics.polygon("fill", {
-            baseX + 32 + pointMargin, baseY - boxMargin,
-            baseX + 32 + pointMargin, baseY,
-            baseX + 32 + pointMargin + (pointWidth * 2), baseY - boxMargin,
-        })
+        -- love.graphics.polygon("fill", {
+        --     baseX + 32 + pointMargin, baseY - boxMargin,
+        --     baseX + 32 + pointMargin, baseY,
+        --     baseX + 32 + pointMargin + (pointWidth * 2), baseY - boxMargin,
+        -- })
 
-        love.graphics.rectangle(
-            "fill",
-            baseX + boxMargin,
-            baseY - boxMargin - boxHeight,
+        -- love.graphics.rectangle(
+        --     "fill",
+        --     baseX + boxMargin,
+        --     baseY - boxMargin - boxHeight,
 
-            256 + 64 - boxMargin - boxMargin,
-            boxHeight
-        )
+        --     256 + 64 - boxMargin - boxMargin,
+        --     boxHeight
+        -- )
 
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.setNewFont(18)
-        love.graphics.print(e.dialog.current().text,
-            baseX + boxMargin + textMargin,
-            baseY - boxMargin - boxHeight + textMargin)
-        love.graphics.setNewFont()
+
+        if pane then
+            local width, height = (256 + 64 - boxMargin - boxMargin), boxHeight
+
+            pane:resize(math.floor(width), math.floor(height))
+            pane:draw(baseX + boxMargin, baseY - boxMargin - boxHeight)
+
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.setNewFont(18)
+            -- love.graphics.print(e.dialog.current().text,
+            --     baseX + boxMargin + textMargin,
+            --     baseY - boxMargin - boxHeight + textMargin)
+            
+            local cx, cy, cw, ch = pane:getContentWindow()
+            love.graphics.setScissor(cx, cy, cw, ch)
+                love.graphics.printf(e.dialog.current().text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
+            love.graphics.setScissor()
+
+            love.graphics.setNewFont()
+        end
 
         love.graphics.pop()
 
