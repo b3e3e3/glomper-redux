@@ -1,11 +1,9 @@
 Util = require 'util'
-
-Bump = require 'libraries.bump'
 Concord = require 'libraries.concord'
-local Gamestate = require 'libraries.hump.gamestate'
-local Timer = require 'libraries.knife.timer'
 
-Quest = require 'game.quest'
+local Bump = require 'libraries.bump'
+local Gamestate = require 'libraries.hump.gamestate'
+local Quest = require 'game.quest'
 
 local _player = nil
 
