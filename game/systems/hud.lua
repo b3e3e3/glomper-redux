@@ -41,58 +41,34 @@ local function _questTextDraw()
 end
 
 function HUDSystem:init()
-    pane = slicy.load("box.9.png")
+    pane = slicy.load('assets/box.9.png')
 end
 
 function HUDSystem:dialogDraw()
     for _, e in ipairs(self.dialog) do
-        if not e.dialog.current() then goto continue end
+        local currentDialog = e.dialog.current()
+        if not currentDialog then goto continue end
 
         love.graphics.push()
 
-        -- local pointMargin = 24
-        -- local pointWidth = 8
         local boxMargin = 32
         local boxHeight = 128
         local textMargin = 8
 
-        -- local r, g, b = 97.3 / 100, 91 / 100, 84.7 / 100
-        local r, g, b = 248 / 255, 232 / 255, 216 / 255
-
         local baseX, baseY = 0, e.position.y
-
-        love.graphics.setColor(r, g, b)
-        -- love.graphics.polygon("fill", {
-        --     baseX + 32 + pointMargin, baseY - boxMargin,
-        --     baseX + 32 + pointMargin, baseY,
-        --     baseX + 32 + pointMargin + (pointWidth * 2), baseY - boxMargin,
-        -- })
-
-        -- love.graphics.rectangle(
-        --     "fill",
-        --     baseX + boxMargin,
-        --     baseY - boxMargin - boxHeight,
-
-        --     256 + 64 - boxMargin - boxMargin,
-        --     boxHeight
-        -- )
-
-
-        if pane then
+        if pane and currentDialog.text then
             local width, height = (256 + 64 - boxMargin - boxMargin), boxHeight
 
             pane:resize(math.floor(width), math.floor(height))
             pane:draw(baseX + boxMargin, baseY - boxMargin - boxHeight)
 
+            love.graphics.reset()
             love.graphics.setColor(1, 1, 1)
-            love.graphics.setNewFont(18)
-            -- love.graphics.print(e.dialog.current().text,
-            --     baseX + boxMargin + textMargin,
-            --     baseY - boxMargin - boxHeight + textMargin)
-            
+            love.graphics.setFont(Game.Fonts.header)
+
             local cx, cy, cw, ch = pane:getContentWindow()
             love.graphics.setScissor(cx, cy, cw, ch)
-                love.graphics.printf(e.dialog.current().text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
+            love.graphics.printf(e.dialog.current().text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
             love.graphics.setScissor()
 
             love.graphics.setNewFont()
@@ -137,8 +113,10 @@ function HUDSystem:update(dt)
 
     for _, e in ipairs(self.dialog) do
         -- print(e.dialog.finished, nextDialog, #e.dialog.queue, e.dialog._index)
-        if Game.Input:pressed("interact") then
-            local lastDialog = e.dialog.current()
+        local lastDialog = e.dialog.current()
+        if Game.Input:pressed("interact")
+            or (lastDialog and not lastDialog.text) -- for if there is no message but an action
+        then
             local dialog = e.dialog.advance()
             if dialog ~= nil then
                 e.dialog.finished = false

@@ -22,6 +22,10 @@ Game = {
     Physics = require 'game.physics',
     Quests = {},
 
+    Fonts = {
+        header = love.graphics.newFont('assets/font/Whacky_Joe_Monospaced.ttf', 24)
+    },
+
     _frozen = false,
 }
 
@@ -167,7 +171,7 @@ local function loadObjects()
             e:give('dialog', {
                 CreateDialogMessage("oh heyyy"),
                 CreateDialogMessage("wtf is up"),
-                StartQuestAndCreateToastMessage(q),
+                StartQuestAndCreateActionMessage(q),
             }, finish)
         end)
 
