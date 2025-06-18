@@ -86,7 +86,7 @@ function PlayerSystem:update(dt)
             return force
         end
 
-        if e.physics.isFrozen then goto continue end
+        if e:has('freeze') then goto continue end
 
         local force = _getForce()
         if Game.Input:pressed('jump') then

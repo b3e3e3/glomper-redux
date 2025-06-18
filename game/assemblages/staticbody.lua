@@ -7,4 +7,5 @@ return function(e, x, y, w, h)
     )
     :ensure("size", w or 32, h or 32)
     :ensure("physics")
+    :ensure("solid")
 end

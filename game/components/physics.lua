@@ -20,17 +20,19 @@ Concord.component("size", function(c, w, h)
     c.h = h or 32
 end)
 
-local physics = Concord.component("physics", function(c, isSolid, gravity)
-    c.gravity = gravity or -12            ---9.8
-    c.isSolid = isSolid == nil or isSolid -- defaults to true if isSolid is nil
-    c.isFrozen = false
+local freeze = Concord.component("freeze", function(_) end)
+local solid = Concord.component("solid", function(_) end)
+
+local physics = Concord.component("physics", function(c, gravity)
+    c.gravity = gravity or -12 ---9.8
+    
 
     c.tempxgrav = 0
 end)
 TestDraw.giveInfoText(physics, function(e)
     local texts = {
-        string.format("isSolid: %s", e.physics.isSolid),
-        string.format("isFrozen: %s", e.physics.isFrozen),
+        string.format("isSolid: %s", e:has('solid')),
+        string.format("isFrozen: %s", e:has('freeze')),
     }
 
     -- TODO: this sucks and we need to make this a system somehow

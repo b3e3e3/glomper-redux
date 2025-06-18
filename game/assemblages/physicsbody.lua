@@ -9,4 +9,5 @@ return function(e, x, y, w, h)
     :ensure("velocity", 0, 0)
     :ensure("direction")
     :ensure("physics")
+    :ensure("solid")
 end

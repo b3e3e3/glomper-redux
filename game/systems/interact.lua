@@ -30,7 +30,7 @@ local function canInteract(with, other)
     local inRange = math.abs(with.position.x - other.position.x) < DIST
     local grounded = Game.Physics.isGrounded(other)
 
-    return not with.interactable.interacting and inRange and grounded
+    return not other:has('freeze') and not with.interactable.interacting and inRange and grounded
 end
 
 function InteractSystem:update(dt)

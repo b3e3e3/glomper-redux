@@ -3,7 +3,7 @@ local Physics = {}
 local function _makeGenericFilter(method)
     return function(item, other)
         if not item:has("physics") or not other:has("physics") then return nil end
-        if not item.physics.isSolid or not other.physics.isSolid then
+        if not item:has('solid') or not other:has('solid') then
             return 'cross'
         end
         return method

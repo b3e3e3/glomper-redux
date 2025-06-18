@@ -20,9 +20,14 @@ function PhysicsSystem:freeze(shouldFreeze, e)
     if shouldFreeze == false then w = "Unfreezing" end
     local function freeze(_e)
         if shouldFreeze == nil then
-            shouldFreeze = not _e.physics.isFrozen
+            shouldFreeze = not _e:has('freeze')
         end
-        _e.physics.isFrozen = shouldFreeze
+        
+        if shouldFreeze then
+            _e:ensure('freeze')
+        else
+            _e:remove('freeze')
+        end
     end
     if e == nil then -- if none specified, freeze all
         print(string.format("%s all entities.", w))
@@ -117,7 +122,7 @@ function PhysicsSystem:update(dt)
     end
 
     for _, e in ipairs(self.physbody) do
-        if e.physics.isFrozen then goto continue end
+        if e:has('freeze') then goto continue end
 
         -- if we are not grounded nor on a wall, we want gravity applied
         if not Game.Physics.isGrounded(e) then

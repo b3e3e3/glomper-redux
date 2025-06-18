@@ -22,7 +22,7 @@ function GlompSystem:glomp(by, other)
     if other:has("glomped") then return end
     other:give("glomped")
     -- other:ensure("physics")
-    other.physics.isSolid = false
+    other:remove('solid')
 
     by.velocity:set(0, 0)
 
@@ -48,7 +48,7 @@ function GlompSystem:jump(e)
     if not e:has('glompsprite') then return end
     if Game.Physics.isGrounded(e) then return end
     if not Game.Input:pressed("jump") then return end
-    if e.physics.isFrozen then return end -- HACK: might be shit
+    if e:has('freeze') then return end -- HACK: might be shit
 
     -- ECS.world:emit("throw", e)
     self:throw(e)
@@ -60,13 +60,13 @@ function GlompSystem:throw(e)
         :remove("glompsprite")
 
     Game.setFreeze(true, e)
-    e.physics.isSolid = false
+    e:remove('solid')
     -- e.position.y = e.position.y - e.size.h
 
     local pe = Game.createProjectile(e)
     pe.projectile.onFinished = function(_)
         e.velocity.x, e.velocity.y = 0, 0
-        e.physics.isSolid = true
+        e:ensure('solid')
         Game.setFreeze(false, e)
 
         -- TODO: RETURN ORIGINAL MOTION

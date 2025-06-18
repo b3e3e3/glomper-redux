@@ -32,7 +32,7 @@ function ProjectileSystem:update(dt)
         e.velocity.x = -e.velocity.x / 4
         e.velocity.y = -500
 
-        e:give("physics", false)
+        e:give("physics")
 
         e.projectile.state = 'spinout'
     end

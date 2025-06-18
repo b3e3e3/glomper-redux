@@ -23,7 +23,7 @@ function Game.setFreeze(shouldFreeze, entity)
     entity = entity or nil
     if shouldFreeze == nil then
         if entity then
-            shouldFreeze = not entity.physics.isFrozen
+            shouldFreeze = not entity:has('freeze')
         else
             shouldFreeze = not Game._frozen
         end
