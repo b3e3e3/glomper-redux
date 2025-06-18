@@ -69,8 +69,15 @@ local function loadObjects()
         :assemble(ECS.a.physicsbody, 32)
         :give("testdraw")
         :give("interactable", function(e, finish)
-            -- ECS.world:emit("say", {
-            e:give('dialog', {
+            -- TODO: better system because this one removes the dialog component every time
+            -- maybe the dialog component could be inactive or something yknow?
+            -- idk.
+            -- we could just have a dialog.isActive variable, but then the onFinish
+            -- callback can't be passed from the interactable.
+            -- then we could make a function, but that requires giving a function
+            -- to the component 👎
+            e
+            :give("dialog", {
                 CreateDialogMessage("oh heyyy"),
                 CreateDialogMessage("wtf is up"),
                 StartQuestAndCreateActionMessage(q),

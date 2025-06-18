@@ -37,8 +37,8 @@ function InteractSystem:update(dt)
     -- TODO: decouple from specific player maybe
     local other = Game.getPlayer()
     for _, e in ipairs(self.inWorld) do
-        if canInteract(e, other) then
-            if Game.Input:pressed("interact") then
+        if Game.Input:pressed("interact") then
+            if canInteract(e, other) then
                 self:start(e, other)
                 e.interactable.onInteract(e, function()
                     self:finish(e, other)

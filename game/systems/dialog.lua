@@ -18,6 +18,8 @@ local function _dialogFinish(e)
 
     e.dialog.onFinished()
     e.dialog._idx = 0
+
+    e:remove('dialog')
 end
 
 function DialogSystem:update(dt)
