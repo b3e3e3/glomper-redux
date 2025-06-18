@@ -4,4 +4,5 @@ return function(e, x, y, w, h, dir, onFinished)
         :give("direction", dir)
         :give("projectile", onFinished)
         :assemble(ECS.a.physicsbody, x, y, w, h)
+        :remove("solid")
 end
