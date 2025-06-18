@@ -1,5 +1,3 @@
-local Quest = require 'game.quest'
-
 function CreateDialogMessage(text, portrait, type, action)
     portrait = portrait or ''
     type = type or 'normal'
@@ -35,14 +33,9 @@ local dialog = Concord.component("dialog", function(c, messages, onFinished)
         return c.queue[index]
     end
 
-    c.current = function()
-        return c.get(c._idx)
-    end
-
-    c.next = function() -- TODO: system
-        return c.get(c._idx + 1)
-    end
-
+    -- TODO: system ?
+    c.current = function() return c.get(c._idx) end
+    c.next = function() return c.get(c._idx + 1) end
     c.advance = function()
         print("Advancing!", c._idx, '->', c._idx + 1)
         c._idx = c._idx + 1

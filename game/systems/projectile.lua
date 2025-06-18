@@ -11,19 +11,20 @@ function ProjectileSystem:update(dt)
         -- TODO: velocity 0 problem happens here i think
         -- POTENTIALLY fixed by game/physics.lua:15 by making the collider "cross"
         -- instead of slide or touch, which might make the velocity 0
-        e.velocity.x = e.projectile.speed * e.direction.last -- e.direction.current
+        -- update: this did not fix it but its maybe more infrequent?? :/
+        e.velocity.x = e.projectile.speed * e.direction.last
         -- print(string.format("%s * %s = %s", e.projectile.speed, e.direction.current, e.velocity.x))
 
         local goalX, goalY = Game.Physics.calculateGoalPos(e.position, e.velocity, dt)
-        local _,_, cols = Game.Physics.checkCollision(e, goalX, goalY, function (item, other)
+        local _, _, cols = Game.Physics.checkCollision(e, goalX, goalY, function(item, other)
             if other:has('controller') then return nil end -- no player!!!
-            return Game.Physics.filters.cross(item, other)--default(item, other)
+            return Game.Physics.filters.cross(item, other) --default(item, other)
         end)
 
         if e.position.x < -e.size.w or e.position.x > Game.getWidth()
-        or #cols > 0 then
-            for _,c in pairs(cols) do ECS.world:emit("hitByProjectile", e, c.other) end
-            e.projectile.state = 'collided'-- self.doCollide(e)
+            or #cols > 0 then
+            for _, c in pairs(cols) do ECS.world:emit("hitByProjectile", e, c.other) end
+            e.projectile.state = 'collided'
         end
     end
 
@@ -58,15 +59,14 @@ function ProjectileSystem:update(dt)
 
         e.testdraw.angle = e.testdraw.angle - spin * dt
 
-        local ydamp = 800
-        
-        ---- 2. stokes drag
         local xvel = e.velocity.x - 1.5 * e.velocity.x * dt
         e.velocity.x = xvel
-        
+
+        local ydamp = 800
+
         local yvel = e.velocity.y + ydamp * dt
         e.velocity.y = yvel
-        
+
         if e.position.y < e.size.h or e.position.y > Game.getHeight() then
             e.projectile.state = 'finished'
         end
@@ -80,11 +80,16 @@ function ProjectileSystem:update(dt)
     end
 
     for _, e in ipairs(self.pool) do
-        if e.projectile.state == 'idle' then idleUpdate(e)
-        elseif e.projectile.state == 'moving' then movingUpdate(e)
-        elseif e.projectile.state == 'collided' then collidedUpdate(e)
-        elseif e.projectile.state == 'spinout' then spinoutUpdate(e)
-        elseif e.projectile.state == 'finished' then finishedUpdate(e)
+        if e.projectile.state == 'idle' then
+            idleUpdate(e)
+        elseif e.projectile.state == 'moving' then
+            movingUpdate(e)
+        elseif e.projectile.state == 'collided' then
+            collidedUpdate(e)
+        elseif e.projectile.state == 'spinout' then
+            spinoutUpdate(e)
+        elseif e.projectile.state == 'finished' then
+            finishedUpdate(e)
         end
     end
 end

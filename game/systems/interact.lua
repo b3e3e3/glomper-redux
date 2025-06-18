@@ -11,7 +11,7 @@ end
 
 function InteractSystem:finish(with, other)
     if not with.interactable.interacting then return end
-    ECS.world:emit("interactFinish", with)--, other)
+    ECS.world:emit("interactFinish", with) --, other)
 end
 
 function InteractSystem:interactStart(with, other)
@@ -26,7 +26,7 @@ end
 local function canInteract(with, other)
     -- TODO: decouple from specific player maybe
     other = other or Game.getPlayer()
-    
+
     local inRange = math.abs(with.position.x - other.position.x) < DIST
     local grounded = Game.Physics.isGrounded(other)
 

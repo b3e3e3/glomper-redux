@@ -1,85 +1,11 @@
 Util = require 'util'
 Concord = require 'libraries.concord'
 
-local Bump = require 'libraries.bump'
 local Gamestate = require 'libraries.hump.gamestate'
 local Quest = require 'game.quest'
 
-local _player = nil
-
-ECS = {
-    c = Concord.components,
-    a = {},
-    s = {},
-    world = Concord.world(),
-}
-
-Game = {
-    bumpWorld = Bump.newWorld(), --64),
-    Input = require 'game.input',
-    Physics = require 'game.physics',
-    Quests = {},
-
-    Fonts = {
-        header = love.graphics.newFont(
-        'assets/font/Whacky_Joe_Monospaced_BM.fnt',
-        'assets/font/Whacky_Joe_Monospaced_BM_0.png'
-    )
-    },
-
-    _frozen = false,
-}
-
-function Game.setFreeze(shouldFreeze, entity)
-    entity = entity or nil
-    if shouldFreeze == nil then
-        shouldFreeze = not Game._frozen
-    end
-
-    Game._frozen = shouldFreeze
-    ECS.world:emit("freeze", shouldFreeze, entity)
-end
-
-function Game.getWidth()
-    return love.graphics.getWidth()
-end
-
-function Game.getHeight()
-    return love.graphics.getHeight()
-end
-
-function Game.getPlayer()
-    return _player
-end
-
-function Game.createQuest(name, desc, rewards)
-    local q = Quest:make(name, desc, rewards)
-
-    table.insert(Game.Quests, q)
-
-    return q
-end
-
-function Game.startQuest(quest)
-    ECS.world:emit("questAdded", quest)
-end
-
-function Game.createPlayer(x, y)
-    _player = Concord.entity(ECS.world)
-        :assemble(ECS.a.player, x, y)
-    return _player
-end
-
-function Game.createProjectile(e)
-    return Concord.entity(ECS.world)
-        :assemble(ECS.a.projectile,
-            e.position.x + (e.size.w * e.direction.last),
-            e.position.y,
-            e.size.x, e.size.y,
-            e.direction.last
-        )
-        :give("testdraw")
-end
+Game = require 'game.engine.game'
+ECS = require 'game.engine.ecs'
 
 Concord.utils.loadNamespace("game/components")
 
@@ -97,14 +23,6 @@ ECS.world:addSystems(
     ECS.s.dialog
 )
 
-function ECS.world:onEntityAdded(e)
-    ECS.world:emit("onEntityAdded", e)
-end
-
-function ECS.world:onEntityRemoved(e)
-    ECS.world:emit("onEntityRemoved", e)
-end
-
 --- GAME STATE
 local gameState = {}
 function gameState:update(dt)
@@ -113,24 +31,6 @@ end
 
 function gameState:draw()
     ECS.world:emit("draw")
-end
-
---- TEXT STATE
-local textState = {}
-function textState:enter()
-    Game.setFreeze(true) -- ECS.world:emit("freeze", true)
-end
-
-function textState:update(dt)
-    ECS.world:emit("update", dt)
-end
-
-function textState:draw()
-    ECS.world:emit("draw")
-end
-
-function textState:exit()
-    Game.setFreeze(false) -- ECS.world:emit("freeze", false)
 end
 
 --- MENU STATE
@@ -160,7 +60,7 @@ local function loadObjects()
     end
 
     local q =
-        Game.createQuest("fuck up a guy", "that guy needs a fuckin",
+        Quest:make("fuck up a guy", "that guy needs a fuckin",
             {
                 MakeQuestRewardAp(666),
             })
@@ -197,8 +97,8 @@ local function loadObjects()
 end
 
 local function loadQuests()
-    Game.createQuest("AHHH", "ooo", nil)
-    Game.createQuest("EEEE", "ooo", nil)
+    Quest:make("AHHH", "ooo", nil)
+    Quest:make("EEEE", "ooo", nil)
 end
 
 function love.load()

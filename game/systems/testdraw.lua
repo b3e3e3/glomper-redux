@@ -80,17 +80,17 @@ function TestDrawSystem:drawGraphic()
         else
             love.graphics.setColor(1, 1, 1)
         end
-        
+
         love.graphics.translate(e.position.x + e.size.w / 2, e.position.y + e.size.h / 2)
         love.graphics.rotate(e.testdraw.angle)
         love.graphics.translate(-e.size.w / 2, -e.size.h / 2)
 
-        local offset = e.offset or {x=0, y=0}
+        local offset = e.offset or { x = 0, y = 0 }
         -- if offset.y ~= 0 then print(string.format("Drawing with offset %s", offset.y)) end
 
         love.graphics.rectangle("fill",
-            0 + offset.x, 0 + offset.y,    
-        -- e.position.x, e.position.y,
+            0 + offset.x, 0 + offset.y,
+            -- e.position.x, e.position.y,
             e.size.w, e.size.h
         )
         love.graphics.pop()
@@ -106,7 +106,7 @@ function TestDrawSystem:draw()
         love.graphics.rectangle(
             "fill",
             e.position.x,
-            e.position.y,-- - 32,
+            e.position.y, -- - 32,
             32, 32
         )
     end
@@ -114,7 +114,7 @@ function TestDrawSystem:draw()
     for _, e in ipairs(self.all) do
         local items = Game.bumpWorld:queryPoint(love.mouse.getX(), love.mouse.getY())
         local shouldDraw = not e.testdraw.infoOnHover
-        
+
         if e.testdraw.infoOnHover and #items > 0 then
             for _, i in ipairs(items) do
                 if e == i then

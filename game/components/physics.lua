@@ -21,7 +21,7 @@ Concord.component("size", function(c, w, h)
 end)
 
 local physics = Concord.component("physics", function(c, isSolid, gravity)
-    c.gravity = gravity or -12---9.8
+    c.gravity = gravity or -12            ---9.8
     c.isSolid = isSolid == nil or isSolid -- defaults to true if isSolid is nil
     c.isFrozen = false
 
@@ -42,7 +42,7 @@ TestDraw.giveInfoText(physics, function(e)
         else
             love.graphics.setColor(1, 0, 0)
         end
-        
+
         local x, y, _, _ = Game.bumpWorld:getRect(e)
         table.insert(texts, string.format("rect: %s, %s", x, y))
         table.insert(texts, string.format("cols: %s", #cols))

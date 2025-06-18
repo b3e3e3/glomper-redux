@@ -20,11 +20,14 @@ function Quest:new(o)
 end
 
 function Quest:make(name, desc, rewards)
-    return Quest:new({
+    local q = Quest:new({
         name = name or Quest.name,
         desc = desc or Quest.desc,
         rewards = rewards or Quest.rewards,
     })
+
+    table.insert(Game.Quests, q)
+    return q
 end
 
 function Quest:doRewards(e)
@@ -32,7 +35,7 @@ function Quest:doRewards(e)
         self.rewards(e)
         return
     end
-    
+
     for i = 1, #self.rewards do
         self.rewards[i](e)
     end

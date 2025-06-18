@@ -1,4 +1,4 @@
-local component = Concord.component("projectile", function (c, onFinished)
+local component = Concord.component("projectile", function(c, onFinished)
     -- TODO: state machine?
     c.state = 'moving'
 

@@ -54,41 +54,20 @@ function GlompSystem:jump(e)
     self:throw(e)
 end
 
--- GLOMP:
--- 1. when glompable is glomped, give glompable "glomped" component
--- 2. remove player entity
--- 3. give controller and glompsprite to the glompable (with mult'd values from player)
---
--- wait for jump, emit throw, then:
--- 1. create player again
--- 2. remove glompable entity
--- 3. create projectile where glompable was (basically)
--- 4. freeze the player and then unfreeze
-
--- FUTURE ISSUES :(
--- * (BIG) what if the player holds important information that can't be recreated after removal?
--- * what if freezing the physics system isn't deep enough?
-
 function GlompSystem:throw(e)
-    -- local by = Game.createPlayer(e.position.x, e.position.y)
-    -- ECS.world:removeEntity(e)
-
-    -- e:ensure("offset")
-    -- e.position.y = e.position.y + e.offset.y
     e
         :remove("offset")
         :remove("glompsprite")
 
-    Game.setFreeze(true, e)     -- e.physics.isFrozen = true
+    Game.setFreeze(true, e)
     e.physics.isSolid = false
-    e.position.y = e.position.y --- e.size.h
+    -- e.position.y = e.position.y - e.size.h
 
-    local projectile = Game.createProjectile(e)
-    projectile.projectile.onFinished = function(projectile)
-        e.velocity.y = 0
-        e.velocity.x = 0
-        Game.setFreeze(false, e) -- e.physics.isFrozen = false
+    local pe = Game.createProjectile(e)
+    pe.projectile.onFinished = function(_)
+        e.velocity.x, e.velocity.y = 0, 0
         e.physics.isSolid = true
+        Game.setFreeze(false, e)
 
         -- TODO: RETURN ORIGINAL MOTION
         e.controller.stats:reset()
