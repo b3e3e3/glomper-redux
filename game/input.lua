@@ -4,6 +4,7 @@ local input = baton.new {
     controls = {
         confirm = { 'key:return' },
         interact = { 'key:return', 'key:e' },
+        escape = { 'key:escape' },
 
         left = { 'key:left', 'key:a' },
         right = { 'key:right', 'key:d' },
