@@ -17,7 +17,6 @@ local function _displayNextQuestText()
     if #questTextQueue == 0 then return end
 
     Game.setFreeze(true)
-    print("Freeze")
 
     questText = questTextQueue[1]
     table.remove(questTextQueue, 1)
@@ -25,7 +24,6 @@ local function _displayNextQuestText()
     -- TODO: states
     Timer.after(2, function()
         questText = nil
-        print("Unfreezs")
         Game.setFreeze(false)
         Timer.after(1, function()
             _displayNextQuestText()
@@ -117,21 +115,22 @@ function HUDSystem:update(dt)
     Timer.update(dt)
 
     for _, e in ipairs(self.dialog) do
-        local nextDialog = e.dialog.next()
         -- print(e.dialog.finished, nextDialog, #e.dialog.queue, e.dialog._index)
         if Game.Input:pressed("interact") then
-            if nextDialog ~= nil then
-                -- TODO: action before or after?
-
+            local lastDialog = e.dialog.current()
+            local dialog = e.dialog.advance()
+            if dialog ~= nil then
                 e.dialog.finished = false
-                local m = e.dialog.advance()
-                if m then
-                    m.action()
-                end
+                -- action before would go here
             else
-                print("We done now")
+                if e.dialog.finished then goto continue end
                 self:dialogFinish(e)
-                goto continue
+            end
+
+            if lastDialog ~= nil then
+                -- TODO: action before or after?
+                -- this is the way for action after
+                lastDialog.action()
             end
         end
 
@@ -147,8 +146,6 @@ end
 
 function HUDSystem:questAdded(quest)
     table.insert(questTextQueue, quest.name)
-
-    print("STARTIN QUES")
 
     if questText then return end
     _displayNextQuestText()
