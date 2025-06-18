@@ -1,11 +1,26 @@
-function CreateDialogMessage(text, portrait, type)
-    portrait = portrait or ""
+local Quest = require 'game.quest'
+
+function CreateDialogMessage(text, portrait, type, action)
+    portrait = portrait or ''
+    type = type or 'normal'
+    action = action or function() end
 
     return {
         text = text,
         portrait = portrait,
         type = type,
+        action = action,
     }
+end
+
+function StartQuestAndCreateToastMessage(quest)
+    -- TODO: create a specific toast for quests
+    local message = CreateDialogMessage(quest.name)
+    message.action = function()
+        Game.startQuest(quest)
+    end
+
+    return message
 end
 
 local dialog = Concord.component("dialog", function(c, messages, onFinished)

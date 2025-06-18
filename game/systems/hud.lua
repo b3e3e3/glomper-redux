@@ -17,20 +17,18 @@ local function _displayNextQuestText()
     if #questTextQueue == 0 then return end
 
     Game.setFreeze(true)
+    print("Freeze")
 
     questText = questTextQueue[1]
     table.remove(questTextQueue, 1)
 
     -- TODO: states
     Timer.after(2, function()
-        questText = "Clear!"
-
-        Timer.after(0.6, function()
-            questText = nil
-            Game.setFreeze(false)
-            Timer.after(1, function()
-                _displayNextQuestText()
-            end)
+        questText = nil
+        print("Unfreezs")
+        Game.setFreeze(false)
+        Timer.after(1, function()
+            _displayNextQuestText()
         end)
     end)
 end
@@ -123,8 +121,13 @@ function HUDSystem:update(dt)
         -- print(e.dialog.finished, nextDialog, #e.dialog.queue, e.dialog._index)
         if Game.Input:pressed("interact") then
             if nextDialog ~= nil then
+                -- TODO: action before or after?
+
                 e.dialog.finished = false
-                e.dialog.advance()
+                local m = e.dialog.advance()
+                if m then
+                    m.action()
+                end
             else
                 print("We done now")
                 self:dialogFinish(e)
@@ -145,8 +148,10 @@ end
 function HUDSystem:questAdded(quest)
     table.insert(questTextQueue, quest.name)
 
-    -- if questText then return end
-    -- _displayNextQuestText()
+    print("STARTIN QUES")
+
+    if questText then return end
+    _displayNextQuestText()
 end
 
 return HUDSystem

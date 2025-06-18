@@ -51,9 +51,12 @@ function Game.createQuest(name, desc, rewards)
     local q = Quest:make(name, desc, rewards)
 
     table.insert(Game.Quests, q)
-    ECS.world:emit("questAdded", q)
 
     return q
+end
+
+function Game.startQuest(quest)
+    ECS.world:emit("questAdded", quest)
 end
 
 function Game.createPlayer(x, y)
@@ -150,6 +153,12 @@ local function loadObjects()
         end
     end
 
+    local q =
+        Game.createQuest("fuck up a guy", "that guy needs a fuckin",
+            {
+                MakeQuestRewardAp(666),
+            })
+
     Concord.entity(ECS.world)
         :assemble(ECS.a.physicsbody, 32)
         :give("testdraw")
@@ -158,6 +167,7 @@ local function loadObjects()
             e:give('dialog', {
                 CreateDialogMessage("oh heyyy"),
                 CreateDialogMessage("wtf is up"),
+                StartQuestAndCreateToastMessage(q),
             }, finish)
         end)
 
