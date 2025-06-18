@@ -59,11 +59,11 @@ function DialogSystem:draw()
 
         love.graphics.push()
 
-        local boxMargin = 32
+        local boxMargin = 16
         local boxHeight = 128
         local textMargin = 8
 
-        local baseX, baseY = 0, e.position.y
+        local baseX, baseY = e.position.x, e.position.y
 
         local __drawPane = function()
             local width, height = (256 + 64 - boxMargin - boxMargin), boxHeight

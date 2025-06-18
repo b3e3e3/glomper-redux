@@ -26,7 +26,7 @@ function Quest:make(name, desc, rewards)
         rewards = rewards or Quest.rewards,
     })
 
-    table.insert(Game.Quests, q)
+    -- table.insert(Game.Quests, q)
     return q
 end
 
