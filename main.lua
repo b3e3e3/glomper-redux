@@ -90,14 +90,17 @@ local function loadInteractTest()
 
             ECS.world:emit("say", e, {
                 CreateDialogMessage("oh heyyy"),
+                CreateWaitActionMessage(2),
+                CreateDialogMessage("oh uh"),
+                CreateWaitActionMessage(1),
                 CreateDialogMessage("wtf is up"),
-                StartQuestAndCreateActionMessage(q),
+                CreateStartQuestActionMessage(q),
             }, finish)
             -- e
             --     :give("dialog", {
             --         CreateDialogMessage("oh heyyy"),
             --         CreateDialogMessage("wtf is up"),
-            --         StartQuestAndCreateActionMessage(q),
+            --         CreateStartQuestActionMessage(q),
             --     }, finish)
         end)
 end

@@ -5,7 +5,7 @@ local slicy = require 'libraries.slicy'
 
 local states = {
     default = {
-        { duration = 0, after = 'idle', action = function() print("pane time") end },
+        { duration = 0, after = 'idle' },
     },
     idle = {
         { duration = 1024, }
@@ -14,7 +14,6 @@ local states = {
         {
             duration = 0.76, -- WHY IS IT 1 AND NOT 2
             action = function(_, e)
-                -- print(string.format("Tweening to %s, %s", paneTargetW, paneTargetH))
                 Chain(
                     function(go)
                         Timer.tween(0.66, e.size, {
@@ -25,19 +24,11 @@ local states = {
                         Timer.tween(0.66, e.size, {
                             h = e.pane.targetSize.h
                         }, 'linear', go)
-                    end,
-                    function(go)
-                        print('done')
-                        go()
                     end
                 )()
-            end
-        },
-        {
-            duration = 0,
-            action = function() print("GRONE") end,
+            end,
             after = 'default'
-        }
+        },
     },
 }
 

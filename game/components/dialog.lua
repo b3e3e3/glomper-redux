@@ -1,7 +1,9 @@
+local Timer = require 'libraries.hump.timer'
+
 function CreateDialogMessage(text, portrait, type, action)
     portrait = portrait or ''
     type = type or 'normal'
-    action = action or function() end
+    action = action
 
     return {
         text = text,
@@ -11,13 +13,26 @@ function CreateDialogMessage(text, portrait, type, action)
     }
 end
 
-function StartQuestAndCreateActionMessage(quest)
+function CreateStartQuestActionMessage(quest)
     -- TODO: create a specific toast for quests
     return {
-        action = function()
+        action = function(onFinished)
+            onFinished()
             Game.startQuest(quest)
         end
     }
+end
+
+function CreateWaitActionMessage(time, panelVisible)
+    local msg = {
+        action = function(onFinished)
+            Timer.after(time, onFinished)
+        end
+    }
+
+    if true then msg.text = "..." end
+
+    return msg
 end
 
 local dialog = Concord.component("dialog", function(c, messages, onFinished)

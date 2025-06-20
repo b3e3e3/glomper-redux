@@ -11,6 +11,8 @@ local function _dialogFinish(e)
 
     e.dialog.finished = true
     e.dialog.onFinished()
+
+    ECS.world:removeEntity(e)
 end
 
 local function _isPaneDoneGrowing(e)
@@ -22,26 +24,24 @@ function DialogSystem:update(dt)
     for _, p in ipairs(self.panes) do
         p.pane.behavior:update(dt)
 
-        local __shouldContinue = function(dialog)
-            local isAction = dialog and not dialog.text
-            return _isPaneDoneGrowing(p)
-                and (Game.Input:pressed("interact")
-                    or isAction)
-        end
-
-        local lastDialog = p.dialog.current()
-        if __shouldContinue(lastDialog) then -- for if there is no message but an action
+        local currentDialog = p.dialog.current()
+        -- if not currentDialog then goto continue end
+        if currentDialog and currentDialog.action then -- for if there is no message but an action
+            local onFinished = function()
+                p.dialog.advance()
+            end
+            if not currentDialog.ranAction then
+                currentDialog.action(onFinished) -- TODO: action before or after?
+                currentDialog.ranAction = true
+            end
+            -- end
+        elseif _isPaneDoneGrowing(p) and Game.Input:pressed("interact") then
             local dialog = p.dialog.advance()
             if dialog ~= nil then
                 p.dialog.finished = false
-                -- action before would go here
             else
                 if p.dialog.finished then goto continue end
                 _dialogFinish(p)
-            end
-
-            if lastDialog ~= nil then
-                lastDialog.action() -- TODO: action before or after?
             end
         end
 
@@ -59,22 +59,28 @@ function DialogSystem:draw()
         local baseX, baseY = p.position.x, p.position.y
 
         local __drawPane = function()
+            if not currentDialog or not currentDialog.text then
+                return
+            end
             p.pane.ui:resize(p.size.w, p.size.h)
             p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h)
             -- p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h) -- THIS WAY makes it grow from the bottom up
         end
 
         local __drawText = function()
+            if not currentDialog or not currentDialog.text then
+                return
+            end
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(Game.Fonts.header)
 
             local cx, cy, cw, ch = p.pane.ui:getContentWindow()
             love.graphics.setScissor(cx, cy, cw, ch)
-            love.graphics.printf(p.dialog.current().text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
+            love.graphics.printf(currentDialog.text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
             love.graphics.setScissor()
         end
 
-        if currentDialog.text then
+        if currentDialog then
             __drawPane()
             if _isPaneDoneGrowing(p) then __drawText() end
 
@@ -92,7 +98,7 @@ local function _initPane(e)
     e.size.w, e.size.h = 0, 0
 
     e.pane.behavior:setState('growing')
-    e.dialog.advance()
+    -- e.dialog.advance()
 end
 
 function DialogSystem:say(e, messages, onFinished)
@@ -110,7 +116,7 @@ function DialogSystem:say(e, messages, onFinished)
         )
         :give('dialog', messages, onFinished)
 
-
+    pane.dialog.advance()
 
     _initPane(pane)
 end
