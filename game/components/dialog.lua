@@ -1,4 +1,4 @@
-local Timer = require 'libraries.hump.timer'
+local advanceCooldown = 0.5
 
 function CreateDialogMessage(text, portrait, type, action)
     portrait = portrait or ''
@@ -36,6 +36,9 @@ function CreateWaitActionMessage(time, panelVisible)
 end
 
 local dialog = Concord.component("dialog", function(c, messages, onFinished)
+    c.__canAdvance = false
+    c.__ranAction = false
+
     c._idx = 0
     c.finished = false
 
@@ -49,11 +52,21 @@ local dialog = Concord.component("dialog", function(c, messages, onFinished)
     end
 
     -- TODO: system ?
+    c.isLast = function() return c._idx >= #c.queue end
     c.current = function() return c.get(c._idx) end
     c.next = function() return c.get(c._idx + 1) end
-    c.advance = function()
+    c.advance = function(force)
+        force = force or false
+        if not force and not c.__canAdvance then return end
+
         print("Advancing!", c._idx, '->', c._idx + 1)
         c._idx = c._idx + 1
-        return c.current()
+        local cur = c.current()
+
+        Timer.after(advanceCooldown, function()
+            c.__canAdvance = true
+        end)
+        
+        return cur
     end
 end)

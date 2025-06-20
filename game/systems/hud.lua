@@ -1,5 +1,3 @@
-local Timer = require 'libraries.hump.timer'
-
 -- TODO: decouple dialog system
 local HUDSystem = Concord.system({
     pool = {
@@ -43,10 +41,6 @@ function HUDSystem:statusDraw()
     love.graphics.print('HP: ' .. e.status.hp, 16, 16)
     love.graphics.print('AP: ' .. e.status.ap, 16, 32)
     -- end
-end
-
-function HUDSystem:update(dt)
-    Timer.update(dt)
 end
 
 function HUDSystem:draw()

@@ -1,7 +1,8 @@
-local Timer = require 'libraries.hump.timer'
 local Behavior = require 'libraries.knife.behavior'
 local Chain = require 'libraries.knife.chain'
 local slicy = require 'libraries.slicy'
+
+local transitionTime = 0.85
 
 local states = {
     default = {
@@ -12,18 +13,43 @@ local states = {
     },
     growing = {
         {
-            duration = 0.76, -- WHY IS IT 1 AND NOT 2
+            duration = transitionTime * 1.1,
             action = function(_, e)
+                ECS.world:emit('paneOpened', e)
                 Chain(
                     function(go)
-                        Timer.tween(0.66, e.size, {
+                        Timer.tween(transitionTime / 2, e.size, {
                             w = e.pane.targetSize.w
                         }, 'linear', go)
                     end,
                     function(go)
-                        Timer.tween(0.66, e.size, {
+                        Timer.tween(transitionTime / 2, e.size, {
                             h = e.pane.targetSize.h
                         }, 'linear', go)
+                    end
+                )()
+            end,
+            after = 'default'
+        },
+    },
+    shrinking = {
+        {
+            duration = transitionTime * 1.1,
+            action = function(_, e)
+                Chain(
+                    function(go)
+                        Timer.tween(transitionTime / 2, e.size, {
+                            h = 0
+                        }, 'linear', go)
+                    end,
+                    function(go)
+                        Timer.tween(transitionTime / 2, e.size, {
+                            w = 0
+                        }, 'linear', go)
+                    end,
+                    function(go)
+                        ECS.world:emit('paneClosed', e)
+                        go()
                     end
                 )()
             end,

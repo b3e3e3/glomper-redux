@@ -1,9 +1,10 @@
-Util = require 'util'
 Concord = require 'libraries.concord'
+Timer = require 'libraries.hump.timer'
 
 local Gamestate = require 'libraries.hump.gamestate'
 local Quest = require 'game.quest'
 
+Util = require 'util'
 Game = require 'game.engine.game'
 ECS = require 'game.engine.ecs'
 
@@ -90,9 +91,9 @@ local function loadInteractTest()
 
             ECS.world:emit("say", e, {
                 CreateDialogMessage("oh heyyy"),
-                CreateWaitActionMessage(2),
-                CreateDialogMessage("oh uh"),
                 CreateWaitActionMessage(1),
+                CreateDialogMessage("oh uh"),
+                CreateWaitActionMessage(0.5),
                 CreateDialogMessage("wtf is up"),
                 CreateStartQuestActionMessage(q),
             }, finish)
@@ -133,7 +134,7 @@ function menuState:enter()
     self.idx = 1
 end
 
-function menuState:update()
+function menuState:update(dt)
     local y = 0
     if Game.Input:pressed("up") then
         y = -1
@@ -214,6 +215,7 @@ function love.load()
 end
 
 function love.update(dt)
+    Timer.update(dt)
     Game.Input:update()
 end
 

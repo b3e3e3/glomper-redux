@@ -1,4 +1,4 @@
-local Timer = require 'libraries.hump.timer'
+local Chain = 'libraries.knife.chain'
 
 local DialogSystem = Concord.system({
     panes = {
@@ -7,42 +7,48 @@ local DialogSystem = Concord.system({
 })
 
 local function _dialogFinish(e)
-    if e.dialog.finished then return end
-
     e.dialog.finished = true
-    e.dialog.onFinished()
-
-    ECS.world:removeEntity(e)
+    e.pane.behavior:setState('shrinking')
 end
 
-local function _isPaneDoneGrowing(e)
-    return e.pane.behavior.state ~= 'growing'
+function DialogSystem:paneClosed(e)
+    e.dialog.onFinished()
+    ECS.world:removeEntity(e)
+
+    
+end
+
+local function _isPaneDoneTransitioning(e)
+    return e.pane.behavior.state ~= 'growing' and e.pane.behavior.state ~= 'shrinking'
 end
 
 function DialogSystem:update(dt)
-    Timer.update(dt)
     for _, p in ipairs(self.panes) do
         p.pane.behavior:update(dt)
+        if not _isPaneDoneTransitioning(p) then goto continue end
 
         local currentDialog = p.dialog.current()
-        -- if not currentDialog then goto continue end
-        if currentDialog and currentDialog.action then -- for if there is no message but an action
-            local onFinished = function()
+        local dialogAdvance = function()
+            if not p.dialog.isLast() then
                 p.dialog.advance()
-            end
-            if not currentDialog.ranAction then
-                currentDialog.action(onFinished) -- TODO: action before or after?
-                currentDialog.ranAction = true
-            end
-            -- end
-        elseif _isPaneDoneGrowing(p) and Game.Input:pressed("interact") then
-            local dialog = p.dialog.advance()
-            if dialog ~= nil then
-                p.dialog.finished = false
             else
-                if p.dialog.finished then goto continue end
-                _dialogFinish(p)
+                return p.dialog.current()
             end
+        end
+        if currentDialog and currentDialog.action then
+            if not currentDialog.__ranAction then
+                currentDialog.action(dialogAdvance)
+                currentDialog.__ranAction = true
+            end
+        elseif Game.Input:pressed("interact") then
+            local _ = dialogAdvance()
+        end
+
+        if not p.dialog.isLast() then
+            p.dialog.finished = false
+        else
+            if p.dialog.finished then goto continue end
+            _dialogFinish(p)
         end
 
         ::continue::
@@ -52,16 +58,16 @@ end
 function DialogSystem:draw()
     for _, p in ipairs(self.panes) do
         local currentDialog = p.dialog.current()
-        if not currentDialog then goto continue end
+        -- if not currentDialog then goto continue end
         love.graphics.push()
 
         local textMargin = 8
         local baseX, baseY = p.position.x, p.position.y
 
         local __drawPane = function()
-            if not currentDialog or not currentDialog.text then
-                return
-            end
+            -- if not currentDialog or not currentDialog.text then
+            --     return
+            -- end
             p.pane.ui:resize(p.size.w, p.size.h)
             p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h)
             -- p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h) -- THIS WAY makes it grow from the bottom up
@@ -82,7 +88,7 @@ function DialogSystem:draw()
 
         if currentDialog then
             __drawPane()
-            if _isPaneDoneGrowing(p) then __drawText() end
+            if _isPaneDoneTransitioning(p) then __drawText() end
 
             love.graphics.reset()
         end
@@ -116,7 +122,7 @@ function DialogSystem:say(e, messages, onFinished)
         )
         :give('dialog', messages, onFinished)
 
-    pane.dialog.advance()
+    pane.dialog.advance(true)
 
     _initPane(pane)
 end
