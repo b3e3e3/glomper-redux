@@ -1,5 +1,3 @@
-local Chain = 'libraries.knife.chain'
-
 local DialogSystem = Concord.system({
     panes = {
         'pane', 'position', 'size'
@@ -7,15 +5,12 @@ local DialogSystem = Concord.system({
 })
 
 local function _dialogFinish(e)
-    e.dialog.finished = true
     e.pane.behavior:setState('shrinking')
 end
 
 function DialogSystem:paneClosed(e)
     e.dialog.onFinished()
     ECS.world:removeEntity(e)
-
-    
 end
 
 local function _isPaneDoneTransitioning(e)
@@ -30,12 +25,12 @@ function DialogSystem:update(dt)
         local currentDialog = p.dialog.current()
         local dialogAdvance = function()
             if not p.dialog.isLast() then
-                p.dialog.advance()
-            else
-                return p.dialog.current()
+                return p.dialog.advance()
             end
+            return p.dialog.current()
         end
-        if currentDialog and currentDialog.action then
+        -- if currentDialog and currentDialog.action then
+        if currentDialog.action then
             if not currentDialog.__ranAction then
                 currentDialog.action(dialogAdvance)
                 currentDialog.__ranAction = true
@@ -44,12 +39,8 @@ function DialogSystem:update(dt)
             local _ = dialogAdvance()
         end
 
-        if not p.dialog.isLast() then
-            p.dialog.finished = false
-        else
-            if p.dialog.finished then goto continue end
-            _dialogFinish(p)
-        end
+        if not p.dialog.isLast() then goto continue end
+        _dialogFinish(p)
 
         ::continue::
     end
@@ -58,19 +49,14 @@ end
 function DialogSystem:draw()
     for _, p in ipairs(self.panes) do
         local currentDialog = p.dialog.current()
-        -- if not currentDialog then goto continue end
         love.graphics.push()
 
         local textMargin = 8
         local baseX, baseY = p.position.x, p.position.y
 
         local __drawPane = function()
-            -- if not currentDialog or not currentDialog.text then
-            --     return
-            -- end
             p.pane.ui:resize(p.size.w, p.size.h)
             p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h)
-            -- p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h) -- THIS WAY makes it grow from the bottom up
         end
 
         local __drawText = function()
@@ -94,8 +80,6 @@ function DialogSystem:draw()
         end
 
         love.graphics.pop()
-
-        ::continue::
     end
 end
 
@@ -104,7 +88,6 @@ local function _initPane(e)
     e.size.w, e.size.h = 0, 0
 
     e.pane.behavior:setState('growing')
-    -- e.dialog.advance()
 end
 
 function DialogSystem:say(e, messages, onFinished)

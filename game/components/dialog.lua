@@ -38,9 +38,7 @@ end
 local dialog = Concord.component("dialog", function(c, messages, onFinished)
     c.__canAdvance = false
     c.__ranAction = false
-
-    c._idx = 0
-    c.finished = false
+    c.__idx = 0
 
     c.queue = messages or {}
     c.onFinished = onFinished or function() end
@@ -52,15 +50,15 @@ local dialog = Concord.component("dialog", function(c, messages, onFinished)
     end
 
     -- TODO: system ?
-    c.isLast = function() return c._idx >= #c.queue end
-    c.current = function() return c.get(c._idx) end
-    c.next = function() return c.get(c._idx + 1) end
+    c.isLast = function() return c.__idx >= #c.queue end
+    c.current = function() return c.get(c.__idx) end
+    c.next = function() return c.get(c.__idx + 1) end
     c.advance = function(force)
         force = force or false
         if not force and not c.__canAdvance then return end
 
-        print("Advancing!", c._idx, '->', c._idx + 1)
-        c._idx = c._idx + 1
+        print("Advancing!", c.__idx, '->', c.__idx + 1)
+        c.__idx = c.__idx + 1
         local cur = c.current()
 
         Timer.after(advanceCooldown, function()
