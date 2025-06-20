@@ -66,9 +66,9 @@ end
 
 local function loadInteractTest()
     loadTestRoom()
-    
+
     local q =
-        Quest:make("fuck up a guy", "that guy needs a fuckin",
+        Quest:make("glomp up a guy!?", "that guy needs a glompin",
             {
                 MakeQuestRewardAp(666),
             })
@@ -80,16 +80,25 @@ local function loadInteractTest()
             -- TODO: better system because this one removes the dialog component every time
             -- maybe the dialog component could be inactive or something yknow?
             -- idk.
+            
             -- we could just have a dialog.isActive variable, but then the onFinish
             -- callback can't be passed from the interactable.
-            -- then we could make a function, but that requires giving a function
-            -- to the component 👎
-            e
-                :give("dialog", {
-                    CreateDialogMessage("oh heyyy"),
-                    CreateDialogMessage("wtf is up"),
-                    StartQuestAndCreateActionMessage(q),
-                }, finish)
+            
+            -- or, we could make dialog:say(), but that requires giving a function
+            -- to the component 👎 seems like a good feel tho idk what to fukin do!
+            -- the only functions other components have are helpers
+
+            ECS.world:emit("say", e, {
+                CreateDialogMessage("oh heyyy"),
+                CreateDialogMessage("wtf is up"),
+                StartQuestAndCreateActionMessage(q),
+            }, finish)
+            -- e
+            --     :give("dialog", {
+            --         CreateDialogMessage("oh heyyy"),
+            --         CreateDialogMessage("wtf is up"),
+            --         StartQuestAndCreateActionMessage(q),
+            --     }, finish)
         end)
 end
 
@@ -123,8 +132,10 @@ end
 
 function menuState:update()
     local y = 0
-    if Game.Input:pressed("up") then y = -1
-    elseif Game.Input:pressed("down") then y = 1
+    if Game.Input:pressed("up") then
+        y = -1
+    elseif Game.Input:pressed("down") then
+        y = 1
     elseif Game.Input:pressed("confirm") then
         self.options[self.idx][2]()
     end

@@ -1,4 +1,4 @@
-local Timer = require 'libraries.knife.timer'
+local Timer = require 'libraries.hump.timer'
 
 -- TODO: decouple dialog system
 local HUDSystem = Concord.system({

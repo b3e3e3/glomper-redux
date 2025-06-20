@@ -1,46 +1,43 @@
-local slicy = require 'libraries.slicy'
+local Timer = require 'libraries.hump.timer'
 
 local DialogSystem = Concord.system({
-    space = {
-        'dialog', 'position', 'interactable'
+    panes = {
+        'pane', 'position', 'size'
     }
 })
 
-local pane
-
-function DialogSystem:init()
-    pane = slicy.load('assets/box.9.png')
-end
-
 local function _dialogFinish(e)
     if e.dialog.finished then return end
+
     e.dialog.finished = true
-
     e.dialog.onFinished()
-    e.dialog._idx = 0
+end
 
-    e:remove('dialog')
+local function _isPaneDoneGrowing(e)
+    return e.pane.behavior.state ~= 'growing'
 end
 
 function DialogSystem:update(dt)
-    local __shouldContinue = function(dialog)
-        local isAction = dialog and not dialog.text
+    Timer.update(dt)
+    for _, p in ipairs(self.panes) do
+        p.pane.behavior:update(dt)
 
-        return Game.Input:pressed("interact")
-            or isAction
-    end
+        local __shouldContinue = function(dialog)
+            local isAction = dialog and not dialog.text
+            return _isPaneDoneGrowing(p)
+                and (Game.Input:pressed("interact")
+                    or isAction)
+        end
 
-    for _, e in ipairs(self.space) do
-        local lastDialog = e.dialog.current()
-
+        local lastDialog = p.dialog.current()
         if __shouldContinue(lastDialog) then -- for if there is no message but an action
-            local dialog = e.dialog.advance()
+            local dialog = p.dialog.advance()
             if dialog ~= nil then
-                e.dialog.finished = false
+                p.dialog.finished = false
                 -- action before would go here
             else
-                if e.dialog.finished then goto continue end
-                _dialogFinish(e)
+                if p.dialog.finished then goto continue end
+                _dialogFinish(p)
             end
 
             if lastDialog ~= nil then
@@ -53,38 +50,33 @@ function DialogSystem:update(dt)
 end
 
 function DialogSystem:draw()
-    for _, e in ipairs(self.space) do
-        local currentDialog = e.dialog.current()
+    for _, p in ipairs(self.panes) do
+        local currentDialog = p.dialog.current()
         if not currentDialog then goto continue end
-
         love.graphics.push()
 
-        local boxMargin = 16
-        local boxHeight = 128
         local textMargin = 8
-
-        local baseX, baseY = e.position.x, e.position.y
+        local baseX, baseY = p.position.x, p.position.y
 
         local __drawPane = function()
-            local width, height = (256 + 64 - boxMargin - boxMargin), boxHeight
-
-            pane:resize(math.floor(width), math.floor(height))
-            pane:draw(baseX + boxMargin, baseY - boxMargin - boxHeight)
+            p.pane.ui:resize(p.size.w, p.size.h)
+            p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h)
+            -- p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h) -- THIS WAY makes it grow from the bottom up
         end
 
         local __drawText = function()
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(Game.Fonts.header)
 
-            local cx, cy, cw, ch = pane:getContentWindow()
+            local cx, cy, cw, ch = p.pane.ui:getContentWindow()
             love.graphics.setScissor(cx, cy, cw, ch)
-            love.graphics.printf(e.dialog.current().text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
+            love.graphics.printf(p.dialog.current().text, cx + textMargin, cy + textMargin, cw - textMargin, "left")
             love.graphics.setScissor()
         end
 
-        if pane and currentDialog.text then
+        if currentDialog.text then
             __drawPane()
-            __drawText()
+            if _isPaneDoneGrowing(p) then __drawText() end
 
             love.graphics.reset()
         end
@@ -95,15 +87,32 @@ function DialogSystem:draw()
     end
 end
 
--- function HUDSystem:say(messages, e, onFinished)
---     if e ~= nil then
---         e:ensure('dialog', messages, onFinished)
---     end
---     -- local x, y = e.position.x, e.position.y
---     -- if not message or message == "" then
---     --     -- TODO: unsay
---     --     return
---     -- end
--- end
+local function _initPane(e)
+    e.pane.targetSize.w, e.pane.targetSize.h = e.size.w, e.size.h
+    e.size.w, e.size.h = 0, 0
+
+    e.pane.behavior:setState('growing')
+    e.dialog.advance()
+end
+
+function DialogSystem:say(e, messages, onFinished)
+    if e == nil then return end
+
+    local width, height = 320, 128
+    local margin = 16
+
+    local pane = Concord.entity(ECS.world)
+        :assemble(ECS.a.dialogpane,
+            e.position.x, e.position.y,
+            width,
+            height,
+            margin
+        )
+        :give('dialog', messages, onFinished)
+
+
+
+    _initPane(pane)
+end
 
 return DialogSystem
