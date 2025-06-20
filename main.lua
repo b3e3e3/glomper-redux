@@ -118,16 +118,16 @@ local gameState = {}
 local menuState = {
     idx = 1,
     options = {
+        { "Interact test", function()
+            loadInteractTest()
+            Game.createPlayer(nil, Game.getHeight() - 132)
+            Gamestate.switch(gameState)
+        end },
         { "Glomp test", function()
             loadGlompTest()
             Game.createPlayer(nil, Game.getHeight() - 132)
             Gamestate.switch(gameState)
         end },
-        { "Interact test", function()
-            loadInteractTest()
-            Game.createPlayer(nil, Game.getHeight() - 132)
-            Gamestate.switch(gameState)
-        end }
     },
 }
 function menuState:enter()

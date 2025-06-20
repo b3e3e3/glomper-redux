@@ -2,7 +2,7 @@ local Behavior = require 'libraries.knife.behavior'
 local Chain = require 'libraries.knife.chain'
 local slicy = require 'libraries.slicy'
 
-local transitionTime = 0.85
+local transitionTime = 0.45
 
 local states = {
     default = {
