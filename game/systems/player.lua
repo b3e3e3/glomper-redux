@@ -31,7 +31,7 @@ end
 
 function PlayerSystem:interactStart(with, other)
     Game.setFreeze(true, other)
-    other.velocity:set(0,0) -- TODO: "stop" function
+    other.velocity:set(0, 0) -- TODO: "stop" function
 end
 
 function PlayerSystem:interactFinish(with, other)
@@ -56,6 +56,7 @@ function PlayerSystem:update(dt)
         end
 
         local _getAccel = function()
+            -- TODO: fix jitter cuz this system sucks bad
             local actualXDir = math.Sign(e.velocity.x)
             if goalXDir == 0 and e.velocity.x == 0 then return 0 end
             local force = tempAccel * goalXDir
