@@ -102,4 +102,12 @@ function HUDSystem:questAdded(quest, time)
     _displayNextQuestText(time)
 end
 
+function HUDSystem:questFinished(quest, time)
+    table.insert(questTextQueue, quest.name)
+    table.insert(questTextQueue, "Clear!")
+
+    if questText then return end
+    _displayNextQuestText(time)
+end
+
 return HUDSystem

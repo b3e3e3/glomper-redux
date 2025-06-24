@@ -39,6 +39,11 @@ function Game.startQuest(quest, timeForTextToRemain)
     ECS.world:emit("questAdded", quest, timeForTextToRemain)
 end
 
+function Game.finishQuest(quest, timeForTextToRemain)
+    timeForTextToRemain = timeForTextToRemain or nil
+    ECS.world:emit("questFinished", quest, timeForTextToRemain)
+end
+
 -- Player
 function Game.getPlayer() return _player end
 

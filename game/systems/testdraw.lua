@@ -94,6 +94,7 @@ function TestDrawSystem:drawGraphic()
             e.size.w, e.size.h
         )
         love.graphics.pop()
+        love.graphics.reset()--setColor(1, 1, 1)
         ::continue::
     end
 end

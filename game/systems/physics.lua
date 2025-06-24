@@ -48,7 +48,8 @@ function PhysicsSystem:move(e, force)
     -- print(force.x, force.y)
 
     -- if math.abs(xforce) <= 0 then return end
-    if not Game.Physics.isOnWall(e) then
+    if not Game.Physics.isOnWall(e) or Game.Physics.isGrounded(e) then
+    -- if not Game.Physics.isOnWall(e) then
         e.velocity.x = force.x
     else
         -- TODO: wall crawling makes you go down for some reason????
