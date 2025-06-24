@@ -39,6 +39,7 @@ function DialogSystem:update(dt)
             local _ = dialogAdvance()
         end
 
+        print((currentDialog.text or "") .. ' Is last?', p.dialog.isLast())
         if not p.dialog.isLast() then goto continue end
         _dialogFinish(p)
 

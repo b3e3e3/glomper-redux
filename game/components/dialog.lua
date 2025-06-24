@@ -13,22 +13,21 @@ function CreateDialogMessage(text, portrait, type, action)
     }
 end
 
+function CreateActionMessage(action) return CreateDialogMessage(nil, nil, nil, action) end
+
 function CreateStartQuestActionMessage(quest)
     -- TODO: create a specific toast for quests
-    return {
-        action = function(onFinished)
-            onFinished()
-            Game.startQuest(quest)
-        end
-    }
+    return CreateActionMessage(function(onFinished)
+        print("Starting quest " .. quest.name .. "!")
+        onFinished()
+        Game.startQuest(quest)
+    end)
 end
 
 function CreateWaitActionMessage(time, panelVisible)
-    local msg = {
-        action = function(onFinished)
-            Timer.after(time, onFinished)
-        end
-    }
+    local msg = CreateActionMessage(function(onFinished)
+        Timer.after(time, onFinished)
+    end)
 
     if true then msg.text = "..." end
 
@@ -50,7 +49,7 @@ local dialog = Concord.component("dialog", function(c, messages, onFinished)
     end
 
     -- TODO: system ?
-    c.isLast = function() return c.__idx >= #c.queue end
+    c.isLast = function() return c.__idx > #c.queue end
     c.current = function() return c.get(c.__idx) end
     c.next = function() return c.get(c.__idx + 1) end
     c.advance = function(force)
@@ -64,7 +63,7 @@ local dialog = Concord.component("dialog", function(c, messages, onFinished)
         Timer.after(advanceCooldown, function()
             c.__canAdvance = true
         end)
-        
+
         return cur
     end
 end)
