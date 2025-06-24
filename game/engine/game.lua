@@ -34,8 +34,9 @@ function Game.setFreeze(shouldFreeze, entity)
 end
 
 -- Quests
-function Game.startQuest(quest)
-    ECS.world:emit("questAdded", quest)
+function Game.startQuest(quest, timeForTextToRemain)
+    timeForTextToRemain = timeForTextToRemain or nil
+    ECS.world:emit("questAdded", quest, timeForTextToRemain)
 end
 
 -- Player

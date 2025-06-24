@@ -39,7 +39,7 @@ function DialogSystem:update(dt)
             local _ = dialogAdvance()
         end
 
-        print((currentDialog.text or "") .. ' Is last?', p.dialog.isLast())
+        -- print((currentDialog.text or "") .. ' Is last?', p.dialog.isLast())
         if not p.dialog.isLast() then goto continue end
         _dialogFinish(p)
 
@@ -55,15 +55,20 @@ function DialogSystem:draw()
         local textMargin = 8
         local baseX, baseY = p.position.x, p.position.y
 
+        local __shouldDraw = function()
+            return currentDialog and currentDialog.text --and currentDialog.text ~= ''
+        end
+
         local __drawPane = function()
+            if not __shouldDraw() then return end
             p.pane.ui:resize(p.size.w, p.size.h)
             p.pane.ui:draw(baseX + p.pane.margin, baseY - p.pane.margin - p.pane.targetSize.h)
         end
 
         local __drawText = function()
-            if not currentDialog or not currentDialog.text then
-                return
-            end
+            if not __shouldDraw() then return end
+            if not _isPaneDoneTransitioning(p) then return end
+            
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(Game.Fonts.header)
 
@@ -73,9 +78,9 @@ function DialogSystem:draw()
             love.graphics.setScissor()
         end
 
-        if currentDialog then
+        if currentDialog and currentDialog.text then
             __drawPane()
-            if _isPaneDoneTransitioning(p) then __drawText() end
+            __drawText()
 
             love.graphics.reset()
         end
@@ -91,8 +96,13 @@ local function _initPane(e)
     e.pane.behavior:setState('growing')
 end
 
-function DialogSystem:say(e, messages, onFinished)
-    if e == nil then return end
+function DialogSystem:say(messages, onFinished, e)
+    -- if e == nil then return end
+    e = e or {
+        position = {
+            x = 32, y = 32
+        }
+    }
 
     local width, height = 320, 128
     local margin = 16

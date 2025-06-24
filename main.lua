@@ -89,7 +89,7 @@ local function loadInteractTest()
             -- to the component 👎 seems like a good feel tho idk what to fukin do!
             -- the only functions other components have are helpers
 
-            ECS.world:emit("say", e, {
+            ECS.world:emit("say", {
                 CreateDialogMessage("oh heyyy"),
                 -- CreateWaitActionMessage(1),
                 CreateDialogMessage("oh uh"),
@@ -104,7 +104,7 @@ local function loadInteractTest()
                     next()
                 end),
                 CreateStartQuestActionMessage(q),
-            }, finish)
+            }, finish, e)
             -- e
             --     :give("dialog", {
             --         CreateDialogMessage("oh heyyy"),
@@ -112,6 +112,22 @@ local function loadInteractTest()
             --         CreateStartQuestActionMessage(q),
             --     }, finish)
         end)
+end
+
+local function loadQuestTest()
+    -- local finish = function()
+    --     print("Quest test done")
+    -- end
+
+    local quest =
+        Quest:make("Quest test!?", "This is a test",
+            {
+                MakeQuestRewardAp(666),
+            })
+    ECS.world:emit("say", {
+        CreateStartQuestActionMessage(quest, 10)
+    })
+    -- Game.startQuest(quest)
 end
 
 local function loadQuests()
@@ -138,6 +154,12 @@ local menuState = {
         end },
     },
 }
+
+table.insert(menuState.options, 1, { "Quest test", function()
+    loadQuestTest()
+    Gamestate.switch(gameState)
+end })
+
 function menuState:enter()
     self.idx = 1
 end
