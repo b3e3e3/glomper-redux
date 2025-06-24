@@ -51,37 +51,28 @@ function PlayerSystem:update(dt)
                 return speed * tempSprintSpeedMod
             end
 
-
             return speed
-        end
-
-        local _getAccel = function()
-            -- TODO: fix jitter cuz this system sucks bad
-            local actualXDir = math.Sign(e.velocity.x)
-            if goalXDir == 0 and e.velocity.x == 0 then return 0 end
-            local force = tempAccel * goalXDir
-            if goalXDir == 0 then
-                force = -tempDecel * actualXDir
-            elseif goalXDir ~= actualXDir then
-                force = tempDecel * tempReverseAccelMod * goalXDir
-            end
-
-            local air = (Game.Physics.isGrounded(e) and 1) or tempAirAccelMod
-            return force * air
         end
 
         local _getForce = function()
             local force = {}
 
             local maxSpeed = _getMaxSpeed()
-            local goalXForce = e.velocity.x + _getAccel()
+            -- local goalXForce = e.velocity.x + _getAccel()
+            local goalXForce = e.velocity.x
+            if math.abs(e.velocity.x) < math.abs(maxSpeed) and goalXDir ~= 0 then
+                goalXForce = goalXForce + math.Sign(goalXDir) * tempAccel
+            end
+
+            if math.abs(e.velocity.x) > 0 and goalXDir == 0 then
+                goalXForce = goalXForce - tempDecel * math.Sign(e.velocity.x)
+            end
 
             -- TODO: smooth transition out of sprinting
             force.x = math.Clamp(goalXForce, -maxSpeed, maxSpeed)
 
             if goalYDir ~= 0 then -- if on wall and trying to crawl up
                 force.y = goalYDir * tempCrawlSpeed
-                -- print(force.y)
             end
 
             return force
