@@ -1,65 +1,120 @@
+local currentQuest = nil
+local rot = 0
+
+local makeQuestToastAnimStates = function()
+    return {
+        default = {
+            {
+                spaceMod = 0,
+                duration = 999,
+                action =
+                    function()
+                        currentQuest = nil
+                    end
+            },
+        },
+        idle = {
+            {
+                spaceMod = 1,
+                duration = 999,
+            },
+        },
+        growing = {
+            {
+                spaceMod = 0,
+                duration = 0.5,
+                action = function(behavior, _)
+                    Timer.tween(0.5, behavior.frame, {
+                        spaceMod = 1,
+                    }, 'linear')
+                end,
+                after = 'idle',
+            },
+        },
+        shrinking = {
+            {
+                spaceMod = 1,
+                duration = 0.5,
+                action = function(behavior, _)
+                    Timer.tween(0.5, behavior.frame, {
+                        spaceMod = 0,
+                    }, 'linear')
+                end,
+            },
+            {
+                spaceMod = 0,
+                duration = 0.1,
+                action = function()
+                    if currentQuest and currentQuest:inWorld(ECS.world) then
+                        ECS.world:removeEntity(currentQuest)
+                    end
+                end,
+                after = 'default',
+            }
+        }
+    }
+end
+
 -- TODO: decouple dialog system
 local HUDSystem = Concord.system({
     pool = {
-        'status'
+        'status',
     },
+    quests = {
+        'questtoast',
+    }
 })
 
-local questText
-local questTextQueue = {}
+function HUDSystem:DisplayNextQuestText()
+    if currentQuest == nil then return end
+    if currentQuest.questtoast.behavior.state ~= 'default' then return end
+    local time = currentQuest.questtoast.duration
 
-local rot = 0
-
-local function _displayNextQuestText(time)
-    time = time or 3
-    if #questTextQueue == 0 then return end
-
-    Game.setFreeze(true)
-
-    questText = questTextQueue[1]
-    table.remove(questTextQueue, 1)
+    currentQuest.questtoast.behavior:setState('growing')
 
     -- TODO: states
     Timer.after(time, function()
-        questText = nil
-        Game.setFreeze(false) -- TODO: override interact freeze
-        Timer.after(1, function()
-            _displayNextQuestText(time)
-        end)
+        currentQuest.questtoast.behavior:setState('shrinking')
     end)
 end
 
-local function _questTextDraw()
-    if questText and questText ~= "" then
+function HUDSystem:questTextDraw()
+    if #self.quests == 0 then return end
+    if currentQuest == nil then return end
+    local quest = currentQuest.questtoast
+    if quest.name and quest.name ~= "" then
         local spacing = 8
+        local spaceMod = quest.behavior.frame.spaceMod or 0
         local blockW, blockH = 32, 48
-        local width = (spacing + blockW) * #questText -- TODO: line width
-        for i = 1, #questText do
-            local c = questText:sub(i, i)
+        local width = (spacing + blockW) * #quest.name -- TODO: line width
+        for i = 1, #quest.name do
+            local c = quest.name:sub(i, i)
             if c == ' ' then goto continue end
 
             local font = Game.Fonts.header
             local fh = font:getBaseline() / 4
 
-            local x = Game.getWidth() / 2 - width / 2 + blockW / 2
-            x = x + ((spacing + blockW) * (i - 1))
+            local x = Game.getWidth() / 2
+            local dx = 0
+            dx = dx - (width / 2) + (blockW / 2) + ((spacing + blockW) * (i - 1))
+            x = x + dx * spaceMod
             local y = 100 + fh
 
             love.graphics.push()
             love.graphics.translate(x, y)
 
             love.graphics.rotate(math.cos(rot * 6) * 0.15)
-            
+
             love.graphics.setColor(1, 0.6, 0)
             love.graphics.rectangle("fill",
-                -blockW/2, -blockH/2, blockW, blockH
+                -blockW / 2, -blockH / 2, blockW, blockH
             )
 
 
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(font)
             love.graphics.printf(c,
-                -blockW/2, --x + ((spacing + blockW) * (i - 1)),
+                -blockW / 2,      --x + ((spacing + blockW) * (i - 1)),
                 -blockH / 2 + fh, --y + fh,
                 blockW, "center"
             )
@@ -71,7 +126,6 @@ local function _questTextDraw()
         end
 
         love.graphics.reset()
-        -- love.graphics.print(questText, Game.getWidth() / 2, Game.getHeight() / 2)
     end
 end
 
@@ -87,27 +141,34 @@ end
 
 function HUDSystem:draw()
     self:statusDraw()
-    _questTextDraw()
+    self:questTextDraw()
 end
 
 function HUDSystem:update(dt)
-    -- if questText and questText ~= '' and Game._frozen ~= true then Game.setFreeze(true) end -- TODO: HACK!!!!
     rot = rot + dt
+    if #self.quests > 0 then
+        if currentQuest then
+            currentQuest.questtoast.behavior:update(dt)
+        else
+            currentQuest = self.quests[1]
+            self:DisplayNextQuestText()
+        end
+    end
 end
 
-function HUDSystem:questAdded(quest, time)
-    table.insert(questTextQueue, quest.name)
+function HUDSystem:questStarted(quest, time)
+    -- TODO: move this out of HUD system? idk
+    local states = makeQuestToastAnimStates()
+    local e = Concord.entity(ECS.world)
+        :give(
+            "questtoast",
+            quest,
+            time,
+            states)
 
-    if questText then return end
-    _displayNextQuestText(time)
+    -- Game.setFreeze(true)
 end
 
-function HUDSystem:questFinished(quest, time)
-    table.insert(questTextQueue, quest.name)
-    table.insert(questTextQueue, "Clear!")
-
-    if questText then return end
-    _displayNextQuestText(time)
-end
+-- function HUDSystem:questFinished(quest, time) 2end
 
 return HUDSystem

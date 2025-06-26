@@ -1,6 +1,6 @@
 local DialogSystem = Concord.system({
     panes = {
-        'pane', 'position', 'size'
+        'dialog', 'pane', 'position', 'size'
     }
 })
 
@@ -30,7 +30,7 @@ function DialogSystem:update(dt)
             return p.dialog.current()
         end
         -- if currentDialog and currentDialog.action then
-        if currentDialog.action then
+        if currentDialog and currentDialog.action then
             if not currentDialog.__ranAction then
                 currentDialog.action(dialogAdvance)
                 currentDialog.__ranAction = true
@@ -39,7 +39,6 @@ function DialogSystem:update(dt)
             local _ = dialogAdvance()
         end
 
-        -- print((currentDialog.text or "") .. ' Is last?', p.dialog.isLast())
         if not p.dialog.isLast() then goto continue end
         _dialogFinish(p)
 

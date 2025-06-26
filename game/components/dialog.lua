@@ -15,13 +15,15 @@ end
 
 function CreateActionMessage(action) return CreateDialogMessage(nil, nil, nil, action) end
 
-function CreateStartQuestActionMessage(quest, timeForTextToRemain)
-    timeForTextToRemain = timeForTextToRemain or nil
-    -- TODO: create a specific toast for quests
+function CreateStartQuestActionMessage(questData, timeForTextToRemain)
+    timeForTextToRemain = timeForTextToRemain or 3
+
     return CreateActionMessage(function(onFinished)
-        print("Starting quest " .. quest.name .. "!")
-        onFinished()
-        Game.startQuest(quest, timeForTextToRemain)
+        -- print("Starting quest " .. questData.name .. "!")
+        Timer.after(timeForTextToRemain, function()
+            onFinished()
+        end)
+        Game.startQuest(questData, timeForTextToRemain)
     end)
 end
 

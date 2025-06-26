@@ -6,6 +6,11 @@ local PhysicsSystem = Concord.system({
 function PhysicsSystem:onEntityAdded(e)
     if not self.all:has(e) then return end
     if Game.bumpWorld:hasItem(e) then return end
+
+    if Game._frozen and not e:has('freeze') then
+        e:ensure('freeze')
+    end
+
     Game.bumpWorld:add(e, e.position.x, e.position.y, e.size.w, e.size.h)
 end
 
@@ -45,11 +50,7 @@ function PhysicsSystem:move(e, force)
         force = { x = force, y = nil }
     end
 
-    -- print(force.x, force.y)
-
-    -- if math.abs(xforce) <= 0 then return end
     if not Game.Physics.isOnWall(e) or Game.Physics.isGrounded(e) then
-    -- if not Game.Physics.isOnWall(e) then
         e.velocity.x = force.x
     else
         -- TODO: wall crawling makes you go down for some reason????

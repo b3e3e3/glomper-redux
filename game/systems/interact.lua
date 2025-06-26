@@ -11,14 +11,14 @@ end
 
 function InteractSystem:finish(with, other)
     if not with.interactable.interacting then return end
-    ECS.world:emit("interactFinish", with) --, other)
+    ECS.world:emit("interactFinished", with) --, other)
 end
 
 function InteractSystem:interactStart(with, other)
     with.interactable.interacting = true
 end
 
-function InteractSystem:interactFinish(with, other)
+function InteractSystem:interactFinished(with, other)
     -- ECS.world:removeEntity(with)
     with.interactable.interacting = false
 end

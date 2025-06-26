@@ -2,7 +2,7 @@ Concord = require 'libraries.concord'
 Timer = require 'libraries.hump.timer'
 
 local Gamestate = require 'libraries.hump.gamestate'
-local Quest = require 'game.quest'
+local QuestData = require 'game.questdata'
 
 Util = require 'util'
 Game = require 'game.engine.game'
@@ -68,11 +68,10 @@ end
 local function loadInteractTest()
     loadTestRoom()
 
-    local q =
-        Quest:make("glomp up a guy!?", "that guy needs a glompin",
-            {
-                MakeQuestRewardAp(666),
-            })
+    local quest = QuestData:make("glomp up a guy!?", "that guy needs a glompin",
+        {
+            MakeQuestRewardAp(666),
+        })
 
     Concord.entity(ECS.world)
         :assemble(ECS.a.physicsbody, 300)
@@ -95,15 +94,14 @@ local function loadInteractTest()
                 CreateDialogMessage("oh uh"),
                 -- CreateWaitActionMessage(0.5),
                 CreateDialogMessage("wtf is up"),
+                CreateStartQuestActionMessage(quest),
                 CreateActionMessage(function(next)
-                    print("YOOOO")
                     Concord.entity(ECS.world)
                         :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + 64)
                         :give("glompable")
                         :give("testdraw")
                     next()
                 end),
-                CreateStartQuestActionMessage(q),
             }, finish, e)
             -- e
             --     :give("dialog", {
@@ -115,24 +113,19 @@ local function loadInteractTest()
 end
 
 local function loadQuestTest()
-    -- local finish = function()
-    --     print("Quest test done")
-    -- end
+    local quest = QuestData:make(
+        "Quest test!?!",
+        "This is a test",
+        {
+            MakeQuestRewardAp(666),
+        })
 
-    local quest =
-        Quest:make("Quest test!?", "This is a test",
-            {
-                MakeQuestRewardAp(666),
-            })
-    ECS.world:emit("say", {
-        CreateStartQuestActionMessage(quest, 10)
-    })
-    -- Game.startQuest(quest)
+    Game.startQuest(quest)
 end
 
 local function loadQuests()
-    Quest:make("AHHH", "ooo", nil)
-    Quest:make("EEEE", "ooo", nil)
+    -- Quest:make("AHHH", "ooo", nil)
+    -- Quest:make("EEEE", "ooo", nil)
 end
 
 --- GAME STATE
