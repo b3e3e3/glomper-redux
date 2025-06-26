@@ -1,60 +1,6 @@
 local currentQuest = nil
 local rot = 0
 
-local makeQuestToastAnimStates = function()
-    return {
-        default = {
-            {
-                spaceMod = 0,
-                duration = 999,
-                action =
-                    function()
-                        currentQuest = nil
-                    end
-            },
-        },
-        idle = {
-            {
-                spaceMod = 1,
-                duration = 999,
-            },
-        },
-        growing = {
-            {
-                spaceMod = 0,
-                duration = 0.5,
-                action = function(behavior, _)
-                    Timer.tween(0.5, behavior.frame, {
-                        spaceMod = 1,
-                    }, 'linear')
-                end,
-                after = 'idle',
-            },
-        },
-        shrinking = {
-            {
-                spaceMod = 1,
-                duration = 0.5,
-                action = function(behavior, _)
-                    Timer.tween(0.5, behavior.frame, {
-                        spaceMod = 0,
-                    }, 'linear')
-                end,
-            },
-            {
-                spaceMod = 0,
-                duration = 0.1,
-                action = function()
-                    if currentQuest and currentQuest:inWorld(ECS.world) then
-                        ECS.world:removeEntity(currentQuest)
-                    end
-                end,
-                after = 'default',
-            }
-        }
-    }
-end
-
 -- TODO: decouple dialog system
 local HUDSystem = Concord.system({
     pool = {
@@ -64,6 +10,13 @@ local HUDSystem = Concord.system({
         'questtoast',
     }
 })
+
+function HUDSystem:questToastClosed()
+    if currentQuest and currentQuest:inWorld(ECS.world) then
+        ECS.world:removeEntity(currentQuest)
+        currentQuest = nil
+    end
+end
 
 function HUDSystem:DisplayNextQuestText()
     if currentQuest == nil then return end
@@ -131,12 +84,11 @@ end
 
 function HUDSystem:statusDraw()
     if #self.pool == 0 then return end
-    local e = self.pool[1] -- TODO: decide on loop or singleton??
-    -- for _, e in ipairs(self.pool) do
+    local e = self.pool[1]
+
     love.graphics.setColor(1, 1, 1)
     love.graphics.print('HP: ' .. e.status.hp, 16, 16)
     love.graphics.print('AP: ' .. e.status.ap, 16, 32)
-    -- end
 end
 
 function HUDSystem:draw()
@@ -158,17 +110,11 @@ end
 
 function HUDSystem:questStarted(quest, time)
     -- TODO: move this out of HUD system? idk
-    local states = makeQuestToastAnimStates()
     local e = Concord.entity(ECS.world)
         :give(
             "questtoast",
             quest,
-            time,
-            states)
-
-    -- Game.setFreeze(true)
+            time)
 end
-
--- function HUDSystem:questFinished(quest, time) 2end
 
 return HUDSystem
