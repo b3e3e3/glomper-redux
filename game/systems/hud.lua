@@ -31,6 +31,8 @@ function HUDSystem:DisplayNextQuestText()
     end)
 end
 
+--== DRAW FUNCTIONS
+
 function HUDSystem:questTextDraw()
     if #self.quests == 0 then return end
     if currentQuest == nil then return end
@@ -109,7 +111,6 @@ function HUDSystem:update(dt)
 end
 
 function HUDSystem:questStarted(quest, time)
-    -- TODO: move this out of HUD system? idk
     local e = Concord.entity(ECS.world)
         :give(
             "questtoast",
