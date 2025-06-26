@@ -77,20 +77,8 @@ local function loadInteractTest()
         :assemble(ECS.a.physicsbody, 300)
         :give("testdraw")
         :give("interactable", function(e, finish)
-            -- TODO: better system because this one removes the dialog component every time
-            -- maybe the dialog component could be inactive or something yknow?
-            -- idk.
-
-            -- we could just have a dialog.isActive variable, but then the onFinish
-            -- callback can't be passed from the interactable.
-
-            -- or, we could make dialog:say(), but that requires giving a function
-            -- to the component 👎 seems like a good feel tho idk what to fukin do!
-            -- the only functions other components have are helpers
-
             ECS.world:emit("say", {
                 CreateDialogMessage("oh heyyy"),
-                -- CreateWaitActionMessage(1),
                 CreateDialogMessage("oh uh"),
                 -- CreateWaitActionMessage(0.5),
                 CreateDialogMessage("wtf is up"),
@@ -103,12 +91,6 @@ local function loadInteractTest()
                     next()
                 end),
             }, finish, e)
-            -- e
-            --     :give("dialog", {
-            --         CreateDialogMessage("oh heyyy"),
-            --         CreateDialogMessage("wtf is up"),
-            --         CreateStartQuestActionMessage(q),
-            --     }, finish)
         end)
 end
 
