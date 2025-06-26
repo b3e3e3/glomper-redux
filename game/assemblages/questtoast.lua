@@ -1,6 +1,5 @@
-local Behavior = require 'libraries.knife.behavior'
 
-local makeAnimStates = function()
+local makeQuestToastAnimStates = function()
     return {
         default = {
             {
@@ -49,17 +48,8 @@ local makeAnimStates = function()
     }
 end
 
-local questtoast = Concord.component("questtoast",
-    function(c, questData, duration)                                                --name, desc, rewards)
-        c.behavior = Behavior(makeAnimStates())
-
-        questData = questData or {
-            name = "No data",
-            desc = "Quest data nil",
-        }
-
-        c.name = questData.name or "A default event?!"
-        c.desc = questData.desc or "The details of this event have been neglected :("
-        c.duration = duration or 3
-        -- c.rewards = questData.rewards or {}
-    end)
+return function(e, questData, duration)
+    e
+    :give("questdata", questData)
+    :give("toast", duration, makeQuestToastAnimStates())
+end

@@ -1,22 +1,22 @@
 local QuestSystem = Concord.system({
     pool = {
-        'questtoast',
+        'questdata',
     }
 })
 
-function QuestSystem:questStarted(quest)
+function QuestSystem:questStarted(questData)
     for _, q in self.pool do
-        if quest ~= q then goto continue end
-        print("Quest has been started!", q.quest.text)
+        if questData.name ~= q.questData.name then goto continue end -- TODO: better comparison
+        print("Quest has been started!", q.questData.name)
         ::continue::
     end
 end
 
-function QuestSystem:questFinished(quest)
+function QuestSystem:questFinished(questData)
     for _, q in self.pool do
-        if quest ~= q then goto continue end
+        if questData.name ~= q.questData.name then goto continue end -- TODO: better comparison
         self:doRewards(q)
-        print("Quest has been finished :')", q.quest.text)
+        print("Quest has been finished :')", q.questData.name)
         ::continue::
     end
 end

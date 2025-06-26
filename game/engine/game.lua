@@ -1,18 +1,39 @@
 local Bump = require 'libraries.bump'
 
+local QuestData = require 'game.questdata'
+
 local _player = nil
 
 local Game = {
     bumpWorld = Bump.newWorld(), --64),
     Input = require 'game.input',
     Physics = require 'game.physics',
-    -- Quests = {},
 
     Fonts = {
         header = love.graphics.newFont(
             'assets/font/Whacky_Joe_Monospaced_BM.fnt',
             'assets/font/Whacky_Joe_Monospaced_BM_0.png'
         )
+    },
+
+    Quests = {
+        -- Quest:make(
+        glomp = {
+            name = "glomp up a guy!?",
+            desc = "that guy needs a glompin",
+            rewards = {
+                MakeQuestRewardAp(666),
+            }
+        },
+
+        test =
+        {
+            name = "A very serious Test of Quests!?!",
+            desc = "This is a test",
+            rewards = {
+                MakeQuestRewardAp(666),
+            }
+        },
     },
 
     _frozen = false,
@@ -36,9 +57,9 @@ function Game.setFreeze(shouldFreeze, entity)
 end
 
 -- Quests
-function Game.startQuest(quest, timeForTextToRemain)
+function Game.startQuest(questData, timeForTextToRemain)
     timeForTextToRemain = timeForTextToRemain or nil
-    ECS.world:emit("questStarted", quest, timeForTextToRemain)
+    ECS.world:emit("questStarted", questData, timeForTextToRemain)
 end
 
 function Game.finishQuest(quest, timeForTextToRemain)

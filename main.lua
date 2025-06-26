@@ -2,7 +2,6 @@ Concord = require 'libraries.concord'
 Timer = require 'libraries.hump.timer'
 
 local Gamestate = require 'libraries.hump.gamestate'
-local QuestData = require 'game.questdata'
 
 Util = require 'util'
 Game = require 'game.engine.game'
@@ -68,11 +67,6 @@ end
 local function loadInteractTest()
     loadTestRoom()
 
-    local quest = QuestData:make("glomp up a guy!?", "that guy needs a glompin",
-        {
-            MakeQuestRewardAp(666),
-        })
-
     Concord.entity(ECS.world)
         :assemble(ECS.a.physicsbody, 300)
         :give("testdraw")
@@ -82,7 +76,7 @@ local function loadInteractTest()
                 CreateDialogMessage("oh uh"),
                 -- CreateWaitActionMessage(0.5),
                 CreateDialogMessage("wtf is up"),
-                CreateStartQuestActionMessage(quest),
+                CreateStartQuestActionMessage(Game.Quests.glomp),
                 CreateActionMessage(function(next)
                     Concord.entity(ECS.world)
                         :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + 64)
@@ -95,14 +89,7 @@ local function loadInteractTest()
 end
 
 local function loadQuestTest()
-    local quest = QuestData:make(
-        "A very serious Test of Quests!?!",
-        "This is a test",
-        {
-            MakeQuestRewardAp(666),
-        })
-
-    Game.startQuest(quest)
+    Game.startQuest(Game.Quests.test)
 end
 
 local function loadQuests()

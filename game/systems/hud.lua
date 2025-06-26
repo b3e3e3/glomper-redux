@@ -7,13 +7,18 @@ local HUDSystem = Concord.system({
         'status',
     },
     quests = {
-        'questtoast',
+        'questdata', 'toast',
+    },
+    activeQuests = {
+        'questdata', 'active',
     }
 })
 
 function HUDSystem:onEntityRemoved(e)
-    if e:has('questtoast') then
-        currentQuest = nil
+    for _, q in ipairs(self.quests) do
+        if e == q then
+            currentQuest = nil
+        end
     end
 end
 
@@ -26,10 +31,10 @@ end
 
 function HUDSystem:DisplayNextQuestText()
     if currentQuest == nil then return end
-    if currentQuest.questtoast.behavior.state ~= 'default' then return end
-    local time = currentQuest.questtoast.duration
+    if currentQuest.toast.behavior.state ~= 'default' then return end
+    local time = currentQuest.toast.duration
 
-    currentQuest.questtoast.behavior:setState('growing')
+    currentQuest.toast.behavior:setState('growing')
 
     local thisQuest = currentQuest
 
@@ -37,7 +42,7 @@ function HUDSystem:DisplayNextQuestText()
     Timer.after(time, function()
         if not currentQuest then return end
         if thisQuest ~= currentQuest then return end -- just in case we open another quest toast and then the timer kicks in
-        currentQuest.questtoast.behavior:setState('shrinking')
+        currentQuest.toast.behavior:setState('shrinking')
     end)
 end
 
@@ -47,9 +52,10 @@ function HUDSystem:questTextDraw()
     if #self.quests == 0 then return end
     if currentQuest == nil then return end
 
-    -- get current quest toast
-    local toast = currentQuest.questtoast
-    if toast.name and toast.name ~= "" then
+    -- get current quest data and toast
+    local toast = currentQuest.toast
+    local questData = currentQuest.questdata
+    if questData.name and questData.name ~= "" then
         -- sizing variables
         local spacing = 8
         local margin = 64
@@ -64,7 +70,7 @@ function HUDSystem:questTextDraw()
 
         local lines = { '' }
 
-        for word in toast.name:gmatch("%S+") do -- TRIM WHITESPACE
+        for word in questData.name:gmatch("%S+") do -- TRIM WHITESPACE
             local _getNewLine = function()
                 return lines[#lines] .. ' ' .. word
             end
@@ -137,13 +143,18 @@ end
 function HUDSystem:draw()
     self:statusDraw()
     self:questTextDraw()
+
+    for i, q in ipairs(self.activeQuests) do
+        love.graphics.print("Active quests", 8, 100)
+        love.graphics.print(q.questdata.name, 8, 100+(16*i))
+    end
 end
 
 function HUDSystem:update(dt)
     rot = rot + dt
     if #self.quests > 0 then
         if currentQuest then
-            currentQuest.questtoast.behavior:update(dt)
+            currentQuest.toast.behavior:update(dt)
         else
             currentQuest = self.quests[1]
             self:DisplayNextQuestText()
@@ -151,11 +162,11 @@ function HUDSystem:update(dt)
     end
 end
 
-function HUDSystem:questStarted(quest, time)
+function HUDSystem:questStarted(questData, time)
     local e = Concord.entity(ECS.world)
-        :give(
-            "questtoast",
-            quest,
+        :assemble(
+            ECS.a.questtoast,
+            questData,
             time)
 end
 
