@@ -52,7 +52,7 @@ function HUDSystem:questTextDraw()
     if toast.name and toast.name ~= "" then
         -- sizing variables
         local spacing = 8
-        local margin = 128
+        local margin = 64
         local spaceMod = toast.behavior.frame.spaceMod or 0
         local blockW, blockH = 32, 48
 
