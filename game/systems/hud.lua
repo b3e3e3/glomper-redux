@@ -51,7 +51,7 @@ function HUDSystem:questTextDraw()
             local dx = 0
             dx = dx - (width / 2) + (blockW / 2) + ((spacing + blockW) * (i - 1))
             x = x + dx * spaceMod
-            local y = 100 + fh
+            local y = 100
 
             love.graphics.push()
             love.graphics.translate(x, y)
