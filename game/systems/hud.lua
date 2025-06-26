@@ -11,6 +11,12 @@ local HUDSystem = Concord.system({
     }
 })
 
+function HUDSystem:onEntityRemoved(e)
+    if e:has('questtoast') then
+        currentQuest = nil
+    end
+end
+
 function HUDSystem:questToastClosed()
     if currentQuest and currentQuest:inWorld(ECS.world) then
         ECS.world:removeEntity(currentQuest)
@@ -25,8 +31,12 @@ function HUDSystem:DisplayNextQuestText()
 
     currentQuest.questtoast.behavior:setState('growing')
 
+    local thisQuest = currentQuest
+
     -- TODO: states
     Timer.after(time, function()
+        if not currentQuest then return end
+        if thisQuest ~= currentQuest then return end -- just in case we open another quest toast and then the timer kicks in
         currentQuest.questtoast.behavior:setState('shrinking')
     end)
 end
@@ -36,48 +46,79 @@ end
 function HUDSystem:questTextDraw()
     if #self.quests == 0 then return end
     if currentQuest == nil then return end
-    local quest = currentQuest.questtoast
-    if quest.name and quest.name ~= "" then
+
+    -- get current quest toast
+    local toast = currentQuest.questtoast
+    if toast.name and toast.name ~= "" then
+        -- sizing variables
         local spacing = 8
-        local spaceMod = quest.behavior.frame.spaceMod or 0
+        local margin = 128
+        local spaceMod = toast.behavior.frame.spaceMod or 0
         local blockW, blockH = 32, 48
-        local width = (spacing + blockW) * #quest.name -- TODO: line width
-        for i = 1, #quest.name do
-            local c = quest.name:sub(i, i)
-            if c == ' ' then goto continue end
 
-            local font = Game.Fonts.header
-            local fh = font:getBaseline() / 4
+        local _getLineWidth = function(str)
+            return (spacing + blockW) * #str
+        end
 
-            local x = Game.getWidth() / 2
-            local dx = 0
-            dx = dx - (width / 2) + (blockW / 2) + ((spacing + blockW) * (i - 1))
-            x = x + dx * spaceMod
-            local y = 100
+        local lineHeight = blockH + spacing
 
-            love.graphics.push()
-            love.graphics.translate(x, y)
+        local lines = { '' }
 
-            love.graphics.rotate(math.cos(rot * 6) * 0.15)
+        for word in toast.name:gmatch("%S+") do -- TRIM WHITESPACE
+            local _getNewLine = function()
+                return lines[#lines] .. ' ' .. word
+            end
 
-            love.graphics.setColor(1, 0.6, 0)
-            love.graphics.rectangle("fill",
-                -blockW / 2, -blockH / 2, blockW, blockH
-            )
+            -- get the width of the line - the margin
+            local maxWidth = Game.getWidth() - margin
+            if _getLineWidth(_getNewLine()) >= maxWidth then
+                table.insert(lines, '')
+            end
+
+            lines[#lines] = _getNewLine()
+        end
+
+        for j = 1, #lines do
+            local line = lines[j]
+            local yoffset = lineHeight * (j - 1)
+            for i = 1, #line do
+                local lineWidth = _getLineWidth(line)
+                local c = line:sub(i, i) -- get char at position i
+                if c == ' ' then goto continue end
+
+                local font = Game.Fonts.header
+                local fh = font:getBaseline() / 4
+
+                local x = Game.getWidth() / 2
+                local dx = -blockW / 2
+                dx = dx - (lineWidth / 2) + (blockW / 2) + ((spacing + blockW) * (i - 1))
+                x = x + dx * spaceMod
+                local y = 100 + yoffset
+
+                love.graphics.push()
+                love.graphics.translate(x, y)
+
+                love.graphics.rotate(math.cos(rot * 6) * 0.15)
+
+                love.graphics.setColor(1, 0.6, 0)
+                love.graphics.rectangle("fill",
+                    -blockW / 2, -blockH / 2, blockW, blockH
+                )
 
 
-            love.graphics.setColor(1, 1, 1)
-            love.graphics.setFont(font)
-            love.graphics.printf(c,
-                -blockW / 2,      --x + ((spacing + blockW) * (i - 1)),
-                -blockH / 2 + fh, --y + fh,
-                blockW, "center"
-            )
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.setFont(font)
+                love.graphics.printf(c,
+                    -blockW / 2,      --x + ((spacing + blockW) * (i - 1)),
+                    -blockH / 2 + fh, --y + fh,
+                    blockW, "center"
+                )
 
-            love.graphics.rotate(0)
-            love.graphics.pop()
+                love.graphics.rotate(0)
+                love.graphics.pop()
 
-            ::continue::
+                ::continue::
+            end
         end
 
         love.graphics.reset()

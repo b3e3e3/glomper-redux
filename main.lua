@@ -96,7 +96,7 @@ end
 
 local function loadQuestTest()
     local quest = QuestData:make(
-        "Quest test!?!",
+        "A very serious Test of Quests!?!",
         "This is a test",
         {
             MakeQuestRewardAp(666),
@@ -127,6 +127,9 @@ local menuState = {
             Game.createPlayer(nil, Game.getHeight() - 132)
             Gamestate.switch(gameState)
         end },
+        { "Quit game", function()
+            love.event.quit()
+        end}
     },
 }
 
@@ -148,7 +151,8 @@ function menuState:update(dt)
     elseif Game.Input:pressed("confirm") then
         self.options[self.idx][2]()
     end
-    self.idx = math.Clamp(self.idx + y, 1, #self.options)
+
+    self.idx = ((self.idx + y - 1) % #self.options) + 1
 end
 
 function menuState:draw()
