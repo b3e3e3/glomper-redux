@@ -1,4 +1,5 @@
 Concord = require 'libraries.concord'
+Signal = require 'libraries.hump.signal'
 Timer = require 'libraries.hump.timer'
 
 local Gamestate = require 'libraries.hump.gamestate'
@@ -20,7 +21,8 @@ ECS.world:addSystems(
     ECS.s.projectile,
     ECS.s.interact,
     ECS.s.hud,
-    ECS.s.dialog
+    ECS.s.dialog,
+    ECS.s.quest
 )
 
 local function loadTestRoom()

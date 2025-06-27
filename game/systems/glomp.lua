@@ -13,16 +13,18 @@ function GlompSystem:hitByProjectile(by, other)
             p.velocity.x = -by.velocity.x
             p.direction.current = -by.direction.last
 
+            Signal.emit('entityKilled', other, by)
+
             ECS.world:removeEntity(other)
         end
     end
 end
 
 function GlompSystem:glomp(by, other)
-    if other:has("glomped") then return end
+    -- if other:has("glomped") then return end
     other:give("glomped")
     -- other:ensure("physics")
-    other:remove('solid')
+    -- other:remove('solid')
 
     by.velocity:set(0, 0)
 
@@ -37,30 +39,36 @@ function GlompSystem:glomp(by, other)
 
     by
         :give("offset", nil, -other.size.h)
-        :give("glompsprite")
+        :give("glompdata")
+        
+    by.glompdata.glompedEntity = other
 
     ECS.world:removeEntity(other)
+    other:remove("glomped")
+
+    Signal.emit('entityGlomped', other, by)
 end
 
 function GlompSystem:jump(e)
     -- if not self.glomped:has(e) then return end
     if not self.glomper:has(e) then return end
-    if not e:has('glompsprite') then return end
+    if not e:has('glompdata') then return end
     if Game.Physics.isGrounded(e) then return end
     if not Game.Input:pressed("jump") then return end
     if e:has('freeze') then return end -- HACK: might be shit
 
-    -- ECS.world:emit("throw", e)
     self:throw(e)
 end
 
 function GlompSystem:throw(e)
+    local glompedEntity = e.glompdata.glompedEntity
     e
         :remove("offset")
-        :remove("glompsprite")
+        :remove("glompdata")
 
     Game.setFreeze(true, e)
     e:remove('solid')
+
     -- e.position.y = e.position.y - e.size.h
 
     local pe = Game.createProjectile(e)
@@ -69,9 +77,13 @@ function GlompSystem:throw(e)
         e:ensure('solid')
         Game.setFreeze(false, e)
 
+        Signal.emit('entityKilled', glompedEntity, e)
+
         -- TODO: RETURN ORIGINAL MOTION
         e.controller.stats:reset()
     end
+
+    Signal.emit('entityThrown', glompedEntity, e)
 end
 
 -- GLOMPABLE
@@ -88,7 +100,7 @@ end
 -- GLOMPER
 function GlompSystem:glomperUpdate(e, dt)
     local function glompFilter(item)
-        if e:has("glomper") and e:has("glompsprite") then return nil end
+        if e:has("glomper") and e:has("glompdata") then return nil end
         if not item:has("glompable") then return nil end
         return 'touch'
     end
@@ -101,7 +113,9 @@ function GlompSystem:glomperUpdate(e, dt)
         glompFilter
     )
     for _, i in ipairs(items) do
-        ECS.world:emit("glomp", e, i)
+        if not i:has("glomped") then
+            ECS.world:emit("glomp", e, i)
+        end
     end
 end
 

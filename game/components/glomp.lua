@@ -23,6 +23,7 @@ end)
 
 local glomped = Concord.component("glomped", function(_) end)
 
-local glompsprite = Concord.component("glompsprite", function(c, sprite)
+local glompdata = Concord.component("glompdata", function(c, sprite)
     c.sprite = sprite or ""
+    c.glompedEntity = nil
 end)

@@ -1,28 +1,47 @@
+local Bind = require 'libraries.knife.bind'
 local QuestSystem = Concord.system({
-    pool = {
-        'questdata',
+    active = {
+        'questdata', 'active'
     }
 })
 
-function QuestSystem:questStarted(questData)
-    for _, q in self.pool do
-        if questData.name ~= q.questData.name then goto continue end -- TODO: better comparison
-        print("Quest has been started!", q.questData.name)
+-- function QuestSystem:update(dt)
+--     for _, q in ipairs(self.active) do
+        
+--     end
+-- end
+
+function QuestSystem:onEntityRemoved(e)
+    for _, q in ipairs(self.active) do
+        if q ~= e then goto continue end
+        if q.questdata.signals and #q.questdata.signals > 0 then
+            for _, s in ipairs(q.questdata.signals) do
+                Signal.remove(s.name, Bind(s.action, q)) -- TODO: does this Bind count as the same func?
+            end
+        end
         ::continue::
     end
 end
 
-function QuestSystem:questFinished(questData)
-    for _, q in self.pool do
-        if questData.name ~= q.questData.name then goto continue end -- TODO: better comparison
-        self:doRewards(q)
-        print("Quest has been finished :')", q.questData.name)
-        ::continue::
+function QuestSystem:questStarted(questData)
+    print("QUESSTART")
+
+    local q = Concord.entity(ECS.world)
+        :assemble(ECS.a.activequest, questData)
+    if q.questdata.signals and #q.questdata.signals > 0 then
+        for _, s in ipairs(q.questdata.signals) do
+            print(s.name, s.action)
+            Signal.register(s.name, Bind(s.action, q))
+        end
     end
+end
+
+function QuestSystem:questFinished(questEntity)
+    ECS.world:removeEntity(questEntity)
+    -- TODO: do rewards
 end
 
 function QuestSystem:doRewards(e)
-    print("TODO: do rewards")
     -- TODO: get player
     -- if type(e.quest.rewards) == 'function' then
     --     self.rewards(player)
@@ -32,3 +51,5 @@ function QuestSystem:doRewards(e)
     -- --     end
     -- end
 end
+
+return QuestSystem

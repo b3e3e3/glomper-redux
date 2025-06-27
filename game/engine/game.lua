@@ -21,6 +21,15 @@ local Game = {
         glomp = {
             name = "glomp up a guy!?",
             desc = "that guy needs a glompin",
+            signals = {
+                {
+                    name = "entityKilled",
+                    action = function(quest, e, by)
+                        print(quest.questdata.name .. " complete!", e)
+                        Game.finishQuest(quest)
+                    end
+                }
+            },
             rewards = {
                 MakeQuestRewardAp(666),
             }
@@ -62,9 +71,9 @@ function Game.startQuest(questData, timeForTextToRemain)
     ECS.world:emit("questStarted", questData, timeForTextToRemain)
 end
 
-function Game.finishQuest(quest, timeForTextToRemain)
+function Game.finishQuest(questEntity, timeForTextToRemain)
     timeForTextToRemain = timeForTextToRemain or nil
-    ECS.world:emit("questFinished", quest, timeForTextToRemain)
+    ECS.world:emit("questFinished", questEntity, timeForTextToRemain)
 end
 
 -- Player

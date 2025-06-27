@@ -4,7 +4,7 @@ local TestDrawSystem = Concord.system({
     all = { "testdraw" },
     pool = { "testdraw", "position", "size" },
     physics = { "testdraw", "physics", "position" },
-    glompsprite = { "glompsprite", "position", "size" },
+    glompdata = { "glompdata", "position", "size" },
 })
 
 -- TODO: standardize draw components
@@ -102,7 +102,7 @@ end
 function TestDrawSystem:draw()
     self:drawGraphic()
 
-    for _, e in ipairs(self.glompsprite) do
+    for _, e in ipairs(self.glompdata) do
         -- love.graphics.setColor(1,1,0)
         love.graphics.rectangle(
             "fill",
