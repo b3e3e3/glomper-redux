@@ -5,7 +5,7 @@ local questdata = Concord.component("questdata", function(c, questData)
 
     for k,v in pairs(questData) do
         if c[k] == nil then
-            c[k] = questData[k]
+            c[k] = v
         end
     end
 

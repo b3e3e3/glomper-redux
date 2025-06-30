@@ -25,8 +25,7 @@ end
 
 function QuestSystem:isActive(questData)
     for _, e in ipairs(self.active) do
-        -- TODO: better idea for comparing quests
-        if questData.name == e.questdata.name then
+        if questData._id == e.questdata._id then
             return true
         end
     end
