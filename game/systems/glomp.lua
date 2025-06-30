@@ -13,7 +13,7 @@ function GlompSystem:hitByProjectile(by, other)
             p.velocity.x = -by.velocity.x
             p.direction.current = -by.direction.last
 
-            Signal.emit('entityKilled', other, by)
+            Signal.emit('entityKilled', other, Game.getPlayer()) -- TODO: incorrectly reporting that the PLAYER killed the entity, and not the projectile it was hit by. mayble the projectile needs a `thrower` var or something
 
             ECS.world:removeEntity(other)
         end

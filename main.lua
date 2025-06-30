@@ -73,20 +73,28 @@ local function loadInteractTest()
         :assemble(ECS.a.physicsbody, 300)
         :give("testdraw")
         :give("interactable", function(e, finish)
-            ECS.world:emit("say", {
-                CreateDialogMessage("oh heyyy"),
-                CreateDialogMessage("oh uh"),
-                -- CreateWaitActionMessage(0.5),
-                CreateDialogMessage("wtf is up"),
-                CreateStartQuestActionMessage(Game.Quests.glomp),
-                CreateActionMessage(function(next)
-                    Concord.entity(ECS.world)
-                        :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + 64)
-                        :give("glompable")
-                        :give("testdraw")
-                    next()
-                end),
-            }, finish, e)
+            if Game.Quests.glomp:isFinished() then
+                ECS.world:emit("say", {
+                    CreateDialogMessage("nice job"),
+                }, e, finish)
+            else
+                ECS.world:emit("say", {
+                    CreateDialogMessage("oh heyyy"),
+                    CreateDialogMessage("oh uh"),
+                    -- CreateWaitActionMessage(0.5),
+                    CreateDialogMessage("wtf is up"),
+                    CreateStartQuestActionMessage(Game.Quests.glomp),
+                    CreateActionMessage(function(next)
+                        for i = 1, 3 do
+                            Concord.entity(ECS.world)
+                            :assemble(ECS.a.physicsbody, (Game.getWidth() / 4) + 64 - (48 * i - 1))
+                            :give("glompable")
+                            :give("testdraw")
+                        next()
+                        end
+                    end),
+                }, e, finish)
+            end
         end)
 end
 
@@ -118,7 +126,7 @@ local menuState = {
         end },
         { "Quit game", function()
             love.event.quit()
-        end}
+        end }
     },
 }
 

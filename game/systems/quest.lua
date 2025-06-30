@@ -49,6 +49,11 @@ function QuestSystem:questStarted(questData)
 end
 
 function QuestSystem:questFinished(questEntity)
+    local quest = questEntity.questdata
+    
+    quest:setFinished()
+    print(quest.name .. ' finished')
+
     ECS.world:removeEntity(questEntity)
     -- TODO: do rewards
 end

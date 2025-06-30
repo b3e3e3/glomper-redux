@@ -4,15 +4,6 @@ local QuestData = require 'game.questdata'
 
 local _player = nil
 
-local questmt = {
-    _id = nil,
-    _finished = false,
-}
-
-function questmt:getId() return self._id end
-function questmt:isFinished() return self._finished end
-function questmt:setFinished() self._finished = true end
-
 local Game = {
     bumpWorld = Bump.newWorld(), --64),
     Input = require 'game.input',
@@ -77,6 +68,15 @@ local Game = {
     _frozen = false,
 }
 
+local questmt = {
+    _id = nil,
+    _finished = false,
+}
+
+function questmt:getId() return self._id end
+function questmt:isFinished() return Game.Quests[self:getId()]._finished end
+function questmt:setFinished() Game.Quests[self:getId()]._finished = true end
+
 for i, v in pairs(Game.Quests) do
     v = setmetatable(v, {__index = questmt})
     v._id = i
@@ -102,7 +102,7 @@ end
 -- Quests
 function Game.startQuest(questData, timeForTextToRemain)
     local questSystem = ECS.world:getSystem(ECS.s.quest)
-    if questSystem:isActive(questData) then
+    if Game.questIsActive(questData) then
         print('QUEST ACTIVE!')
         return false
     end
@@ -116,6 +116,11 @@ end
 function Game.finishQuest(questEntity, timeForTextToRemain)
     timeForTextToRemain = timeForTextToRemain or nil
     ECS.world:emit("questFinished", questEntity, timeForTextToRemain)
+end
+
+function Game.questIsActive(questData)
+    local questSystem = ECS.world:getSystem(ECS.s.quest)
+    return questSystem:isActive(questData)
 end
 
 -- Player

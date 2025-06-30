@@ -95,7 +95,7 @@ local function _initPane(e)
     e.pane.behavior:setState('growing')
 end
 
-function DialogSystem:say(messages, onFinished, e)
+function DialogSystem:say(messages, e, onFinished)
     -- if e == nil then return end
     e = e or {
         position = {
