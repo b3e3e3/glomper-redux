@@ -40,7 +40,7 @@ function PhysicsSystem:freeze(shouldFreeze, e)
             freeze(v)
         end
     else
-        print(string.format("%s single entity. Player? %s", w, e:has("controller")))
+        print(string.format("%s single entity. Player? %s", w, Game.entityIsPlayer(e)))
         freeze(e)
     end
 end

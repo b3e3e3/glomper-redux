@@ -19,11 +19,12 @@ function CreateStartQuestActionMessage(questData, timeForTextToRemain)
     timeForTextToRemain = timeForTextToRemain or 3
 
     return CreateActionMessage(function(onFinished)
-        -- print("Starting quest " .. questData.name .. "!")
+        local success = Game.startQuest(questData, timeForTextToRemain)
+        if not success then onFinished() return end
+
         Timer.after(timeForTextToRemain, function()
             onFinished()
         end)
-        Game.startQuest(questData, timeForTextToRemain)
     end)
 end
 

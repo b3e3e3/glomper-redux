@@ -1,11 +1,11 @@
-function MakeQuestRewardAp(apBonus)
+local QuestData = {}
+
+function QuestData.MakeQuestRewardAp(apBonus)
     return function(e)
         print(string.format("%s AP reward!", apBonus))
         e.status.ap = e.status.ap + apBonus
     end
 end
-
-local QuestData = {}
 
 function QuestData:make(name, desc, rewards)
     local q = {

@@ -19,19 +19,31 @@ local Game = {
     Quests = {
         -- Quest:make(
         glomp = {
-            name = "glomp up a guy!?",
-            desc = "that guy needs a glompin",
+            name = "glomp up 3 guys!?",
+            desc = "no desc wtf",
+            kills = 0,
             signals = {
                 {
                     name = "entityKilled",
-                    action = function(quest, e, by)
-                        print(quest.questdata.name .. " complete!", e)
-                        Game.finishQuest(quest)
+                    action = function(finish, quest, e, by)
+                        local isPlayer = Game.entityIsPlayer(by)
+                        print('By has controller?', isPlayer)
+                        if not isPlayer then
+                            return
+                        end
+                        quest.kills = quest.kills + 1
+                        if quest.kills < 3 then
+                            print(string.format('%s to go', 3 - quest.kills))
+                        else
+                            print(quest.name .. " complete!", e)
+                            -- Game.finishQuest(quest)
+                            finish()
+                        end
                     end
                 }
             },
             rewards = {
-                MakeQuestRewardAp(666),
+                QuestData.MakeQuestRewardAp(666),
             }
         },
 
@@ -40,7 +52,14 @@ local Game = {
             name = "A very serious Test of Quests!?!",
             desc = "This is a test",
             rewards = {
-                MakeQuestRewardAp(666),
+                QuestData.MakeQuestRewardAp(666),
+            },
+            signals = {
+                name = "update",
+                action = function(finish, quest)
+                    print("Finishing quest " .. quest.name)
+                    finish()
+                end
             }
         },
     },
@@ -67,8 +86,13 @@ end
 
 -- Quests
 function Game.startQuest(questData, timeForTextToRemain)
+    local questSystem = ECS.world:getSystem(ECS.s.quest)
+    if questSystem:isActive(questData) then print('QUEST ACTIVE!') return false end
+
     timeForTextToRemain = timeForTextToRemain or nil
     ECS.world:emit("questStarted", questData, timeForTextToRemain)
+
+    return true
 end
 
 function Game.finishQuest(questEntity, timeForTextToRemain)
@@ -101,5 +125,7 @@ end
 function Game.getWidth() return love.graphics.getWidth() end
 
 function Game.getHeight() return love.graphics.getHeight() end
+
+function Game.entityIsPlayer(e) return e:has('controller') end
 
 return Game

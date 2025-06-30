@@ -75,7 +75,7 @@ function TestDrawSystem:drawGraphic()
     for _, e in ipairs(self.pool) do
         if not e.testdraw.visible then goto continue end
         love.graphics.push()
-        if e:has("controller") then
+        if Game.entityIsPlayer(e) then
             love.graphics.setColor(1, 0, 1)
         else
             love.graphics.setColor(1, 1, 1)

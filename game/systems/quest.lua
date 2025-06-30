@@ -7,7 +7,7 @@ local QuestSystem = Concord.system({
 
 -- function QuestSystem:update(dt)
 --     for _, q in ipairs(self.active) do
-        
+
 --     end
 -- end
 
@@ -23,15 +23,28 @@ function QuestSystem:onEntityRemoved(e)
     end
 end
 
-function QuestSystem:questStarted(questData)
-    print("QUESSTART")
+function QuestSystem:isActive(questData)
+    for _, e in ipairs(self.active) do
+        -- TODO: better idea for comparing quests
+        if questData.name == e.questdata.name then
+            return true
+        end
+    end
 
+    return false
+end
+
+function QuestSystem:questStarted(questData)
+    
     local q = Concord.entity(ECS.world)
         :assemble(ECS.a.activequest, questData)
     if q.questdata.signals and #q.questdata.signals > 0 then
         for _, s in ipairs(q.questdata.signals) do
             print(s.name, s.action)
-            Signal.register(s.name, Bind(s.action, q))
+            local finish = function()
+                Game.finishQuest(q)
+            end
+            Signal.register(s.name, Bind(s.action, finish, q.questdata))
         end
     end
 end
