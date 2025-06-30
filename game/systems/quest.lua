@@ -34,7 +34,6 @@ function QuestSystem:isActive(questData)
 end
 
 function QuestSystem:questStarted(questData)
-    
     local q = Concord.entity(ECS.world)
         :assemble(ECS.a.activequest, questData)
     if q.questdata.signals and #q.questdata.signals > 0 then
@@ -50,11 +49,11 @@ end
 
 function QuestSystem:questFinished(questEntity)
     local quest = questEntity.questdata
-    
+
     quest:setFinished()
     print(quest.name .. ' finished')
 
-    ECS.world:removeEntity(questEntity)
+    -- ECS.world:removeEntity(questEntity)
     -- TODO: do rewards
 end
 

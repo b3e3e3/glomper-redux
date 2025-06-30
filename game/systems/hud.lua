@@ -6,7 +6,7 @@ local HUDSystem = Concord.system({
     pool = {
         'status',
     },
-    quests = {
+    questToasts = {
         'questdata', 'toast',
     },
     activeQuests = {
@@ -41,7 +41,7 @@ end
 --== DRAW FUNCTIONS
 
 function HUDSystem:questTextDraw()
-    if #self.quests == 0 then return end
+    if #self.questToasts == 0 then return end
     if currentQuest == nil then return end
 
     -- get current quest data and toast
@@ -138,17 +138,17 @@ function HUDSystem:draw()
 
     for i, q in ipairs(self.activeQuests) do
         love.graphics.print("Active quests", 8, 100)
-        love.graphics.print(q.questdata.name, 8, 100+(16*i))
+        love.graphics.print(q.questdata.name, 8, 100 + (16 * i))
     end
 end
 
 function HUDSystem:update(dt)
     rot = rot + dt
-    if #self.quests > 0 then
+    if #self.questToasts > 0 then
         if currentQuest then
             currentQuest.toast.behavior:update(dt)
         else
-            currentQuest = self.quests[1]
+            currentQuest = self.questToasts[1]
             self:DisplayNextQuestText()
         end
     else
@@ -162,6 +162,35 @@ function HUDSystem:questStarted(questData, time)
             ECS.a.questtoast,
             questData,
             time)
+end
+
+function HUDSystem:questFinished(questEntity, time)
+    time = time or 5 -- 5 to make up for the padding for the animations. TODO: make this sync with signals?
+    -- questEntity:remove('active')
+    ECS.world:removeEntity(questEntity)
+
+    ECS.world:emit("say", {
+        CreateActionMessage(function(e, finish)
+            Game.setFreeze(true)
+            Timer.after(time, function() Game.setFreeze(false) end)
+            
+            Concord.entity(ECS.world)
+                :assemble(
+                    ECS.a.questtoast,
+                    questEntity.questdata,
+                    time * 0.6
+                )
+
+            Concord.entity(ECS.world)
+                :assemble(
+                    ECS.a.questtoast,
+                    {
+                        name = "Clear!",
+                    },
+                    time * 0.4
+                )
+        end)
+    })
 end
 
 return HUDSystem

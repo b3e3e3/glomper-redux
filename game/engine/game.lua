@@ -101,7 +101,6 @@ end
 
 -- Quests
 function Game.startQuest(questData, timeForTextToRemain)
-    local questSystem = ECS.world:getSystem(ECS.s.quest)
     if Game.questIsActive(questData) then
         print('QUEST ACTIVE!')
         return false
