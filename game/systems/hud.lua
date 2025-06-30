@@ -14,14 +14,6 @@ local HUDSystem = Concord.system({
     }
 })
 
-function HUDSystem:onEntityRemoved(e)
-    for _, q in ipairs(self.quests) do
-        if e == q then
-            currentQuest = nil
-        end
-    end
-end
-
 function HUDSystem:questToastClosed()
     if currentQuest and currentQuest:inWorld(ECS.world) then
         ECS.world:removeEntity(currentQuest)
@@ -159,6 +151,8 @@ function HUDSystem:update(dt)
             currentQuest = self.quests[1]
             self:DisplayNextQuestText()
         end
+    else
+        currentQuest = nil
     end
 end
 
