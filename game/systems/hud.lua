@@ -165,9 +165,10 @@ function HUDSystem:questStarted(questData, time)
 end
 
 function HUDSystem:questFinished(questEntity, time)
-    time = time or 5 -- 5 to make up for the padding for the animations. TODO: make this sync with signals?
+    time = time or 4 -- to make up for the padding for the animations. TODO: make this sync with signals?
     -- questEntity:remove('active')
-    ECS.world:removeEntity(questEntity)
+    print("Quest finished!")
+    -- ECS.world:removeEntity(questEntity)
 
     ECS.world:emit("say", {
         CreateActionMessage(function(e, finish)
@@ -178,7 +179,7 @@ function HUDSystem:questFinished(questEntity, time)
                 :assemble(
                     ECS.a.questtoast,
                     questEntity.questdata,
-                    time * 0.6
+                    2
                 )
 
             Concord.entity(ECS.world)
@@ -187,7 +188,7 @@ function HUDSystem:questFinished(questEntity, time)
                     {
                         name = "Clear!",
                     },
-                    time * 0.4
+                    1
                 )
         end)
     })

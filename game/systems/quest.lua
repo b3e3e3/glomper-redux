@@ -13,6 +13,7 @@ local QuestSystem = Concord.system({
 
 function QuestSystem:onEntityRemoved(e)
     for _, q in ipairs(self.active) do
+        print('Quest removed?', q==e)
         if q ~= e then goto continue end
         if q.questdata.signals and #q.questdata.signals > 0 then
             for _, s in ipairs(q.questdata.signals) do
@@ -53,7 +54,10 @@ function QuestSystem:questFinished(questEntity)
     quest:setFinished()
     print(quest.name .. ' finished')
 
-    -- ECS.world:removeEntity(questEntity)
+    if questEntity:inWorld(ECS.world) then 
+        ECS.world:removeEntity(questEntity)
+    end
+    
     -- TODO: do rewards
 end
 
