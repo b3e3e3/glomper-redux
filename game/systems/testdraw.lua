@@ -78,7 +78,8 @@ function TestDrawSystem:drawGraphic()
         if Game.entityIsPlayer(e) then
             love.graphics.setColor(1, 0, 1)
         else
-            love.graphics.setColor(1, 1, 1)
+            local r,g,b = e.testdraw.color.r, e.testdraw.color.b, e.testdraw.color.b
+            love.graphics.setColor(r, g, b)
         end
 
         love.graphics.translate(e.position.x + e.size.w / 2, e.position.y + e.size.h / 2)

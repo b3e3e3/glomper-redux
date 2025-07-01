@@ -1,5 +1,10 @@
 -- TODO: standardize draw components
 local component = Concord.component("testdraw", function(c, infoOnHover)
+    c.color = {
+        r = math.random(),
+        g = math.random(),
+        b = math.random(),
+    }
     c.offset = { x = 0, y = 0 }
     c.visible = true
     c.angle = 0

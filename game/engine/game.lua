@@ -1,3 +1,4 @@
+local Bind = require 'libraries.knife.bind'
 local Bump = require 'libraries.bump'
 
 local QuestData = require 'game.questdata'
@@ -19,50 +20,49 @@ local Game = {
     Quests = {
         -- Quest:make(
         glomp =
-            {
-                name = "glomp up 3 guys!?",
-                desc = "no desc wtf",
-                kills = 0,
-                signals = {
-                    {
-                        name = "entityKilled",
-                        action = function(finish, quest, e, by)
-                            local isPlayer = Game.entityIsPlayer(by)
-                            print('By has controller?', isPlayer)
-                            if not isPlayer then
-                                return
-                            end
-                            quest.kills = quest.kills + 1
-                            if quest.kills < 3 then
-                                print(string.format('%s to go', 3 - quest.kills))
-                            else
-                                print(quest.name .. " complete!", e)
-                                -- Game.finishQuest(quest)
-                                finish()
-                            end
+        {
+            name = "glomp up 3 guys!?",
+            desc = "no desc wtf",
+            kills = 0,
+            signals = {
+                {
+                    name = "entityKilled",
+                    action = function(finish, quest, e, by)
+                        local isPlayer = Game.entityIsPlayer(by)
+                        print('By has controller?', isPlayer)
+                        if not isPlayer then
+                            return
                         end
-                    }
-                },
-                rewards = {
-                    QuestData.MakeQuestRewardAp(666),
-                }
-            },
-
-        test =
-            {
-                name = "A very serious Test of Quests!?!",
-                desc = "This is a test",
-                rewards = {
-                    QuestData.MakeQuestRewardAp(666),
-                },
-                signals = {
-                    name = "update",
-                    action = function(finish, quest)
-                        print("Finishing quest " .. quest.name)
-                        finish()
+                        quest.kills = quest.kills + 1
+                        if quest.kills < 1 then
+                            print(string.format('%s to go', 3 - quest.kills))
+                        else
+                            print(quest.name .. " complete!", e)
+                            finish()
+                        end
                     end
                 }
             },
+            rewards = {
+                QuestData.MakeQuestRewardAp(666),
+            }
+        },
+
+        test =
+        {
+            name = "A very serious Test of Quests!?!",
+            desc = "This is a test",
+            rewards = {
+                QuestData.MakeQuestRewardAp(666),
+            },
+            signals = {
+                name = "update",
+                action = function(finish, quest)
+                    print("Finishing quest " .. quest.name)
+                    finish()
+                end
+            }
+        },
     },
 
     _frozen = false,
@@ -73,12 +73,39 @@ local questmt = {
     _finished = false,
 }
 
+function questmt:bindSignals(e)
+    if self.signals and #self.signals > 0 then
+        for _, s in ipairs(self.signals) do
+            print(s.name, s.action)
+            local finish = function()
+                Game.finishQuest(e)
+            end
+            s._boundAction = Bind(s.action, finish, self)
+            Signal.register(s.name, s._boundAction)
+        end
+    end
+end
+
+function questmt:unbindSignals()
+    if self.signals and #self.signals > 0 then
+        for _, s in ipairs(self.signals) do
+            Signal.remove(s.name, s._boundAction) -- TODO: does this Bind count as the same func?
+            s._boundAction = nil
+        end
+    end
+end
+
 function questmt:getId() return self._id end
+
 function questmt:isFinished() return Game.Quests[self:getId()]._finished end
-function questmt:setFinished() Game.Quests[self:getId()]._finished = true end
+
+function questmt:setFinished()
+    self:unbindSignals()
+    Game.Quests[self:getId()]._finished = true
+end
 
 for i, v in pairs(Game.Quests) do
-    v = setmetatable(v, {__index = questmt})
+    v = setmetatable(v, { __index = questmt })
     v._id = i
 end
 
