@@ -17,6 +17,7 @@ ECS.world:addSystems(
     ECS.s.physics,
     ECS.s.testdraw,
     ECS.s.player,
+    ECS.s.combat,
     ECS.s.glomp,
     ECS.s.projectile,
     ECS.s.interact,

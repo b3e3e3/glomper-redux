@@ -30,7 +30,7 @@ local function updateDirection(e, xdir)
 end
 
 function PlayerSystem:interactStart(with, other)
-    Game.setFreeze(true)--, other)
+    Game.setFreeze(true)     --, other)
     other.velocity:set(0, 0) -- TODO: "stop" function
 end
 
@@ -38,7 +38,7 @@ function PlayerSystem:interactFinished(with, other)
     Game.setFreeze(false, other)
 end
 
-function PlayerSystem:update(dt)
+function PlayerSystem:movementUpdate(dt)
     for _, e in ipairs(self.pool) do
         local goalXDir, goalYDir = Game.Input:get('move')
 
@@ -53,7 +53,6 @@ function PlayerSystem:update(dt)
 
             return speed
         end
-
         local _getForce = function()
             local force = {}
 
@@ -77,7 +76,6 @@ function PlayerSystem:update(dt)
 
             return force
         end
-
         if e:has('freeze') then goto continue end
 
         local force = _getForce()
@@ -86,13 +84,23 @@ function PlayerSystem:update(dt)
         end
 
         self:doMove(e, force)
-
         if e:has("direction") then
             updateDirection(e, goalXDir)
         end
 
         ::continue::
     end
+end
+
+-- function PlayerSystem:inputsUpdate(dt)
+--     for _, e in ipairs(self.pool) do
+        
+--     end
+-- end
+
+function PlayerSystem:update(dt)
+    self:movementUpdate(dt)
+    -- self:inputsUpdate(dt)
 end
 
 return PlayerSystem
